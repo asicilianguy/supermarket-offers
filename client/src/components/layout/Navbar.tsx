@@ -66,12 +66,15 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
-    // Clear token from both localStorage and cookies
+    // Clear token from localStorage
     localStorage.removeItem("token")
-    Cookies.remove("token")
 
-    // Forza un hard refresh per assicurarsi che tutti gli stati vengano resettati
-    window.location.href = "/"
+    // Clear token from cookies - assicuriamoci di rimuovere il cookie correttamente
+    // Rimuovi con opzioni specifiche per garantire che venga eliminato correttamente
+    Cookies.remove("token", { path: "/" })
+
+    // Forza un hard refresh verso la pagina di login
+    window.location.href = "/login"
   }
 
   const navLinks = [
