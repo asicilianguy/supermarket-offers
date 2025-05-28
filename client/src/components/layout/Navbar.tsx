@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { showToast } from "@/components/ui/Toast"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -48,6 +49,7 @@ export default function Navbar() {
           }
         } catch (error) {
           console.error("Error fetching user data:", error)
+          showToast.error("Errore nel caricamento dei dati utente")
         }
       }
     }
@@ -64,6 +66,9 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
+    // Mostra un toast informativo
+    showToast.info("Logout in corso...")
+
     // Reindirizza alla pagina di logout
     window.location.href = "/logout"
   }

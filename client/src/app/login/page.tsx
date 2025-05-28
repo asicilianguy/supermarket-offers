@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import { useLoginMutation } from "@/redux/features/user/userApiSlice"
 import { LogIn, Lock } from "lucide-react"
 import Cookies from "js-cookie"
+import { showToast } from "@/components/ui/Toast"
 
 export default function Login() {
   const router = useRouter()
@@ -48,12 +49,14 @@ export default function Login() {
       localStorage.setItem("token", result.token)
       Cookies.set("token", result.token, { expires: 7 }) // expires in 7 days
 
-      console.log("Login successful, token saved:", result.token)
+      showToast.success("Login effettuato con successo!")
 
       // Use window.location for a hard redirect
       window.location.href = "/dashboard"
     } catch (err: any) {
-      setError(err.data?.message || "Credenziali non valide")
+      const errorMessage = err.data?.message || "Credenziali non valide"
+      setError(errorMessage)
+      showToast.error(errorMessage)
     }
   }
 

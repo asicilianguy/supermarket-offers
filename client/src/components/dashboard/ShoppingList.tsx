@@ -10,6 +10,7 @@ import {
   useAddToShoppingListMutation,
   useRemoveFromShoppingListMutation,
 } from "@/redux/features/user/userApiSlice"
+import { showToast } from "@/components/ui/Toast"
 
 export default function ShoppingList() {
   const { data: shoppingList, isLoading } = useGetShoppingListQuery()
@@ -30,18 +31,22 @@ export default function ShoppingList() {
         notes: newItemNotes.trim() || undefined,
       }).unwrap()
 
+      showToast.success(`"${newItem}" aggiunto alla lista della spesa`)
       setNewItem("")
       setNewItemNotes("")
     } catch (error) {
       console.error("Failed to add item to shopping list:", error)
+      showToast.error("Impossibile aggiungere il prodotto alla lista")
     }
   }
 
-  const handleRemoveItem = async (itemId: string) => {
+  const handleRemoveItem = async (itemId: string, productName: string) => {
     try {
       await removeFromShoppingList(itemId).unwrap()
+      showToast.info(`"${productName}" rimosso dalla lista della spesa`)
     } catch (error) {
       console.error("Failed to remove item from shopping list:", error)
+      showToast.error("Impossibile rimuovere il prodotto dalla lista")
     }
   }
 
@@ -119,7 +124,10 @@ export default function ShoppingList() {
                     <p className="text-sm font-medium text-gray-900">{item.productName}</p>
                     {item.notes && <p className="text-xs text-gray-500">{item.notes}</p>}
                   </div>
-                  <button onClick={() => handleRemoveItem(item._id)} className="text-gray-400 hover:text-red-500">
+                  <button
+                    onClick={() => handleRemoveItem(item._id, item.productName)}
+                    className="text-gray-400 hover:text-red-500"
+                  >
                     <X className="h-4 w-4" />
                   </button>
                 </div>

@@ -11,6 +11,7 @@ import SupermarketSelector from "@/components/auth/SupermarketSelector"
 import { SUPERMARKETS } from "@/constants/supermarkets"
 import { User, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react"
 import Cookies from "js-cookie"
+import { showToast } from "@/components/ui/Toast"
 
 export default function Register() {
   const router = useRouter()
@@ -47,6 +48,7 @@ export default function Register() {
       ...formData,
       frequentedSupermarkets: [...SUPERMARKETS],
     })
+    showToast.info("Tutti i supermercati selezionati")
   }
 
   const nextStep = (e: React.FormEvent) => {
@@ -55,21 +57,25 @@ export default function Register() {
       // Validate first step
       if (!formData.name || !formData.phoneNumber || !formData.password || !formData.confirmPassword) {
         setError("Compila tutti i campi per continuare")
+        showToast.error("Compila tutti i campi per continuare")
         return
       }
 
       if (formData.password !== formData.confirmPassword) {
         setError("Le password non coincidono")
+        showToast.error("Le password non coincidono")
         return
       }
 
       if (formData.password.length < 6) {
         setError("La password deve contenere almeno 6 caratteri")
+        showToast.error("La password deve contenere almeno 6 caratteri")
         return
       }
 
       setError("")
       setStep(2)
+      showToast.info("Ora seleziona i tuoi supermercati preferiti")
     }
   }
 
@@ -87,6 +93,7 @@ export default function Register() {
     // Validate form
     if (formData.frequentedSupermarkets.length === 0) {
       setError("Seleziona almeno un supermercato")
+      showToast.error("Seleziona almeno un supermercato")
       return
     }
 
@@ -108,10 +115,14 @@ export default function Register() {
       localStorage.setItem("token", result.token)
       Cookies.set("token", result.token, { expires: 7 }) // expires in 7 days
 
+      showToast.success("Registrazione completata con successo!")
+
       // Use window.location for a hard redirect
       window.location.href = "/dashboard"
     } catch (err: any) {
-      setError(err.data?.message || "Errore durante la registrazione")
+      const errorMessage = err.data?.message || "Errore durante la registrazione"
+      setError(errorMessage)
+      showToast.error(errorMessage)
     }
   }
 

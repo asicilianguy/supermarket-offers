@@ -1,34 +1,28 @@
 import type React from "react"
-import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import "./globals.css"
 import { Providers } from "./providers"
-import Navbar from "../components/layout/Navbar"
-import Footer from "../components/layout/Footer"
-import CookieDebugger from "@/components/debug/CookieDebugger"
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
+import { ToastContainerWrapper } from "@/components/ui/Toast"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "RisparmiApp - Risparmia sulla spesa",
-  description: "Trova le migliori offerte nei supermercati che frequenti",
+  title: "RisparmiApp - Trova le migliori offerte nei supermercati",
+  description: "Scopri le migliori offerte nei supermercati vicino a te con RisparmiApp",
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it">
       <body className={inter.className}>
         <Providers>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow bg-white">{children}</main>
-            <Footer />
-            {process.env.NODE_ENV !== "production" && <CookieDebugger />}
-          </div>
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+          <ToastContainerWrapper />
         </Providers>
       </body>
     </html>
