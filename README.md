@@ -59,12 +59,12 @@ npm run dev
 \`\`\`
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 JWT_SECRET=your_jwt_secret
-PORT=5000
+PORT=3001
 \`\`\`
 
 ### Client (.env.local)
 \`\`\`
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
 \`\`\`
 
 ## Struttura del Database
