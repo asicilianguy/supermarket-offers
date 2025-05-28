@@ -1,37 +1,23 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Cookies from "js-cookie"
+import { logout } from "../actions/auth"
 
-export default function Logout() {
-  const router = useRouter()
-
+export default function LogoutPage() {
   useEffect(() => {
-    // Funzione per pulire tutti i cookie e localStorage
-    const clearAuthData = () => {
-      // 1. Pulisci localStorage
-      localStorage.removeItem("token")
+    // Pulisci localStorage e sessionStorage
+    localStorage.removeItem("token")
+    sessionStorage.clear()
 
-      // 2. Pulisci tutti i possibili cookie di autenticazione
-      Cookies.remove("token")
-      Cookies.remove("token", { path: "/" })
+    // Pulisci i cookie lato client (come backup)
+    document.cookie.split(";").forEach((cookie) => {
+      const [name] = cookie.trim().split("=")
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+    })
 
-      // 3. Usa l'API nativa dei cookie per una pulizia più aggressiva
-      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-      document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-      document.cookie = "x-auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-
-      // 4. Pulisci sessionStorage
-      sessionStorage.clear()
-    }
-
-    // Esegui la pulizia
-    clearAuthData()
-
-    // Reindirizza alla pagina di login
-    router.push("/login")
-  }, [router])
+    // Chiama l'azione server per pulire i cookie lato server
+    logout()
+  }, [])
 
   return (
     <div className="flex items-center justify-center min-h-screen">
