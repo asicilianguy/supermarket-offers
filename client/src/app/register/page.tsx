@@ -10,6 +10,7 @@ import { useRegisterMutation } from "@/redux/features/user/userApiSlice"
 import SupermarketSelector from "@/components/auth/SupermarketSelector"
 import { SUPERMARKETS } from "@/constants/supermarkets"
 import { User, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react"
+import Cookies from "js-cookie"
 
 export default function Register() {
   const router = useRouter()
@@ -103,11 +104,12 @@ export default function Register() {
         frequentedSupermarkets: formData.frequentedSupermarkets,
       }).unwrap()
 
-      // Store token in localStorage
+      // Store token in both localStorage and cookie
       localStorage.setItem("token", result.token)
+      Cookies.set("token", result.token, { expires: 7 }) // expires in 7 days
 
-      // Redirect to dashboard
-      router.push("/dashboard")
+      // Use window.location for a hard redirect
+      window.location.href = "/dashboard"
     } catch (err: any) {
       setError(err.data?.message || "Errore durante la registrazione")
     }

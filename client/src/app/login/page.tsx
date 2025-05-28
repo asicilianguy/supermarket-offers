@@ -8,6 +8,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useLoginMutation } from "@/redux/features/user/userApiSlice"
 import { LogIn, Lock } from "lucide-react"
+import Cookies from "js-cookie"
 
 export default function Login() {
   const router = useRouter()
@@ -43,15 +44,14 @@ export default function Login() {
         password: formData.password,
       }).unwrap()
 
-      // Store token in localStorage
+      // Store token in both localStorage and cookie
       localStorage.setItem("token", result.token)
+      Cookies.set("token", result.token, { expires: 7 }) // expires in 7 days
 
       console.log("Login successful, token saved:", result.token)
 
-      // Redirect to dashboard with a slight delay to ensure localStorage is updated
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 100)
+      // Use window.location for a hard redirect
+      window.location.href = "/dashboard"
     } catch (err: any) {
       setError(err.data?.message || "Credenziali non valide")
     }

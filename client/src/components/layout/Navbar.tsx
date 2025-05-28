@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
 import { useGetUserProfileQuery } from "@/redux/features/user/userApiSlice"
 import { motion, AnimatePresence } from "framer-motion"
+import Cookies from "js-cookie"
 
 export default function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -41,6 +43,15 @@ export default function Navbar() {
 
   const closeMenu = () => {
     setIsOpen(false)
+  }
+
+  const handleLogout = () => {
+    // Clear token from both localStorage and cookies
+    localStorage.removeItem("token")
+    Cookies.remove("token")
+
+    // Redirect to login page
+    window.location.href = "/login"
   }
 
   const navLinks = [
@@ -112,6 +123,12 @@ export default function Navbar() {
                 <div className="bg-primary-100 text-primary-800 px-4 py-2 rounded-xl text-sm font-medium">
                   {user.name.split(" ")[0]}
                 </div>
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
             )}
           </div>
@@ -171,6 +188,12 @@ export default function Navbar() {
                       <p className="font-medium text-gray-900">{user.name}</p>
                       <p className="text-sm text-gray-500">{user.phoneNumber}</p>
                     </div>
+                    <button
+                      onClick={handleLogout}
+                      className="ml-auto p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </button>
                   </div>
                 </motion.div>
               )}
