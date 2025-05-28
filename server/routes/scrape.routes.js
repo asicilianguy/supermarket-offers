@@ -1,4 +1,7 @@
 import express from "express"
+import { scrapeAll, getScrapingStatus } from "../controllers/scrapers/scraper.controller.js"
+
+// Importa dinamicamente tutti gli scraper
 import esselungaScraper from "../controllers/scrapers/esselunga.scraper.js"
 import conadScraper from "../controllers/scrapers/conad.scraper.js"
 import lidlScraper from "../controllers/scrapers/lidl.scraper.js"
@@ -18,30 +21,59 @@ import todisScraper from "../controllers/scrapers/todis.scraper.js"
 import mdScraper from "../controllers/scrapers/md.scraper.js"
 import craiScraper from "../controllers/scrapers/crai.scraper.js"
 import paghipocoScraper from "../controllers/scrapers/paghipoco.scraper.js"
-import { scrapeAll, getScrapingStatus } from "../controllers/scrapers/scraper.controller.js"
 
 const router = express.Router()
 
+// List of all supermarkets
+const SUPERMARKETS = [
+  "esselunga",
+  "conad",
+  "lidl",
+  "eurospin",
+  "bennet",
+  "auchan",
+  "penny",
+  "despar",
+  "centesimo",
+  "carrefouriper",
+  "carrefourexpress",
+  "prestofresco",
+  "carrefourmarket",
+  "gigante",
+  "ins",
+  "todis",
+  "md",
+  "crai",
+  "paghipoco",
+]
+
+// Mappa dei nomi dei supermercati ai loro scraper
+const scraperMap = {
+  esselunga: esselungaScraper,
+  conad: conadScraper,
+  lidl: lidlScraper,
+  eurospin: eurospinScraper,
+  bennet: bennetScraper,
+  auchan: auchanScraper,
+  penny: pennyScraper,
+  despar: desparScraper,
+  centesimo: centesimoScraper,
+  carrefouriper: carrefouriperScraper,
+  carrefourexpress: carrefourexpressScraper,
+  prestofresco: prestofrescoScraper,
+  carrefourmarket: carrefourmarketScraper,
+  gigante: giganteScraper,
+  ins: insScraper,
+  todis: todisScraper,
+  md: mdScraper,
+  crai: craiScraper,
+  paghipoco: paghipocoScraper,
+}
+
 // Definizione delle route per ogni supermercato
-router.get("/esselunga", esselungaScraper)
-router.get("/conad", conadScraper)
-router.get("/lidl", lidlScraper)
-router.get("/eurospin", eurospinScraper)
-router.get("/bennet", bennetScraper)
-router.get("/auchan", auchanScraper)
-router.get("/penny", pennyScraper)
-router.get("/despar", desparScraper)
-router.get("/centesimo", centesimoScraper)
-router.get("/carrefouriper", carrefouriperScraper)
-router.get("/carrefourexpress", carrefourexpressScraper)
-router.get("/prestofresco", prestofrescoScraper)
-router.get("/carrefourmarket", carrefourmarketScraper)
-router.get("/gigante", giganteScraper)
-router.get("/ins", insScraper)
-router.get("/todis", todisScraper)
-router.get("/md", mdScraper)
-router.get("/crai", craiScraper)
-router.get("/paghipoco", paghipocoScraper)
+SUPERMARKETS.forEach((supermarket) => {
+  router.get(`/${supermarket}`, scraperMap[supermarket])
+})
 
 // Route per scraping di tutti i supermercati
 router.get("/all", scrapeAll)
