@@ -9,10 +9,15 @@
     --background-end-rgb: 255, 255, 255;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     color: rgb(var(--foreground-rgb));
     background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   h1,
@@ -25,21 +30,34 @@
   }
 
   h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl;
+    @apply text-2xl sm:text-3xl md:text-4xl;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl;
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+
+  /* Improved touch targets for mobile */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    @apply touch-manipulation;
   }
 }
 
 @layer components {
+  .mobile-container {
+    @apply px-4 sm:px-6 md:px-8 mx-auto max-w-7xl w-full;
+  }
+
   .btn {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center px-5 py-3 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 touch-manipulation;
   }
 
   .btn-primary {
@@ -55,7 +73,37 @@
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-card hover:shadow-hover transition-shadow duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden;
+  }
+
+  .card-stacked {
+    @apply relative transition-all duration-300 ease-in-out;
+  }
+
+  .card-stacked:hover {
+    @apply -translate-y-1;
+  }
+
+  .card-stacked::before,
+  .card-stacked::after {
+    content: "";
+    @apply absolute left-0 right-0 h-full bg-white rounded-2xl -z-10 transition-all duration-300;
+  }
+
+  .card-stacked::before {
+    @apply bottom-1 shadow-stack-1 w-[98%] mx-auto;
+  }
+
+  .card-stacked::after {
+    @apply bottom-2 shadow-stack-2 w-[96%] mx-auto;
+  }
+
+  .card-stacked:hover::before {
+    @apply bottom-2;
+  }
+
+  .card-stacked:hover::after {
+    @apply bottom-4;
   }
 
   .input-wrapper {
@@ -63,7 +111,7 @@
   }
 
   .input {
-    @apply w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200 touch-manipulation;
   }
 
   .input-label {
@@ -79,7 +127,7 @@
   }
 
   .nav-link {
-    @apply px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200;
+    @apply px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 touch-manipulation;
   }
 
   .nav-link-active {
@@ -91,39 +139,101 @@
   }
 
   .section {
-    @apply py-16 md:py-24;
+    @apply py-12 sm:py-16 md:py-20;
   }
 
   .section-title {
-    @apply text-center mb-12;
+    @apply text-center mb-8 sm:mb-12;
   }
 
   .section-title h2 {
-    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4;
   }
 
   .section-title p {
-    @apply text-xl text-gray-700 max-w-3xl mx-auto;
+    @apply text-base sm:text-lg md:text-xl text-gray-700 max-w-3xl mx-auto;
   }
 
   .feature-card {
-    @apply bg-white p-6 rounded-2xl shadow-soft hover:shadow-hover transition-all duration-300 border border-gray-100 hover:border-primary-100;
+    @apply bg-white p-5 sm:p-6 rounded-2xl shadow-soft hover:shadow-hover transition-all duration-300 border border-gray-100 hover:border-primary-100;
   }
 
   .feature-icon {
     @apply mb-4 p-3 rounded-xl bg-primary-50 text-primary-600 inline-block;
   }
 
-  .checkbox-wrapper {
-    @apply flex items-center p-3 rounded-xl cursor-pointer transition-colors;
+  /* Supermarket card selector */
+  .supermarket-card {
+    @apply relative bg-white rounded-xl shadow-soft overflow-hidden transition-all duration-300 touch-manipulation;
   }
 
-  .checkbox-selected {
-    @apply bg-primary-50 border border-primary-200;
+  .supermarket-card-selected {
+    @apply border-2 border-primary-500 shadow-md;
   }
 
-  .checkbox-unselected {
-    @apply bg-gray-50 border border-gray-200 hover:bg-gray-100;
+  .supermarket-card-unselected {
+    @apply border border-gray-200;
+  }
+
+  .supermarket-card-content {
+    @apply p-4 flex items-center;
+  }
+
+  .supermarket-card-check {
+    @apply absolute top-2 right-2 bg-primary-500 text-white rounded-full p-1 transform transition-all duration-300;
+  }
+
+  /* Card stack for mobile */
+  .card-stack {
+    @apply relative w-full;
+  }
+
+  .card-stack-item {
+    @apply absolute w-full transition-all duration-500 ease-in-out;
+  }
+
+  /* Bottom sheet for mobile */
+  .bottom-sheet {
+    @apply fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out z-50;
+  }
+
+  .bottom-sheet-open {
+    @apply translate-y-0;
+  }
+
+  .bottom-sheet-closed {
+    @apply translate-y-full;
+  }
+
+  .bottom-sheet-handle {
+    @apply w-12 h-1 bg-gray-300 rounded-full mx-auto my-3;
+  }
+
+  /* Mobile optimized tabs */
+  .mobile-tabs {
+    @apply flex overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar;
+  }
+
+  .mobile-tab {
+    @apply px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap mr-2 transition-colors duration-200 touch-manipulation;
+  }
+
+  .mobile-tab-active {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .mobile-tab-inactive {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }
 
@@ -142,6 +252,14 @@
 
 .animate-pulse-slow {
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-card-shift {
+  animation: cardShift 0.5s ease-out forwards;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes fadeIn {
@@ -171,5 +289,51 @@
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes cardShift {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-5px) rotate(-2deg);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile-first media queries */
+@media (max-width: 640px) {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-full-height {
+    min-height: 100vh;
+  }
+
+  .mobile-bottom-padding {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 }

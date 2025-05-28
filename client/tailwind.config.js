@@ -57,15 +57,62 @@ module.exports = {
         soft: "0 4px 20px rgba(0, 0, 0, 0.05)",
         hover: "0 10px 25px rgba(0, 0, 0, 0.1)",
         card: "0 10px 30px rgba(0, 0, 0, 0.08)",
+        "card-hover": "0 15px 35px rgba(0, 0, 0, 0.12)",
+        inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)",
+        "stack-1": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        "stack-2": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        "stack-3": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
       },
       animation: {
         float: "float 6s ease-in-out infinite",
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "card-shift": "cardShift 0.5s ease-out forwards",
+        "slide-up": "slideUp 0.5s ease-out forwards",
+        "slide-down": "slideDown 0.5s ease-out forwards",
+        "slide-in-right": "slideInRight 0.5s ease-out forwards",
+        "slide-in-left": "slideInLeft 0.5s ease-out forwards",
+        "fade-in": "fadeIn 0.5s ease-out forwards",
+        "scale-in": "scaleIn 0.5s ease-out forwards",
+        "bounce-in": "bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        cardShift: {
+          "0%": { transform: "translateY(0) rotate(0deg)" },
+          "100%": { transform: "translateY(-5px) rotate(-2deg)" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(20px)", opacity: 0 },
+          "100%": { transform: "translateY(0)", opacity: 1 },
+        },
+        slideDown: {
+          "0%": { transform: "translateY(-20px)", opacity: 0 },
+          "100%": { transform: "translateY(0)", opacity: 1 },
+        },
+        slideInRight: {
+          "0%": { transform: "translateX(20px)", opacity: 0 },
+          "100%": { transform: "translateX(0)", opacity: 1 },
+        },
+        slideInLeft: {
+          "0%": { transform: "translateX(-20px)", opacity: 0 },
+          "100%": { transform: "translateX(0)", opacity: 1 },
+        },
+        fadeIn: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
+        scaleIn: {
+          "0%": { transform: "scale(0.9)", opacity: 0 },
+          "100%": { transform: "scale(1)", opacity: 1 },
+        },
+        bounceIn: {
+          "0%": { transform: "scale(0.3)", opacity: 0 },
+          "50%": { transform: "scale(1.05)" },
+          "70%": { transform: "scale(0.9)" },
+          "100%": { transform: "scale(1)", opacity: 1 },
         },
       },
     },
