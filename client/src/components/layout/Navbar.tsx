@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { logout } from "@/app/actions/auth"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -64,16 +63,9 @@ export default function Navbar() {
     setIsOpen(false)
   }
 
-  const handleClientLogout = () => {
-    // Pulisci localStorage e sessionStorage
-    localStorage.removeItem("token")
-    sessionStorage.clear()
-
-    // Pulisci i cookie lato client (come backup)
-    document.cookie.split(";").forEach((cookie) => {
-      const [name] = cookie.trim().split("=")
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-    })
+  const handleLogout = () => {
+    // Reindirizza alla pagina di logout
+    window.location.href = "/logout"
   }
 
   const navLinks = [
@@ -145,15 +137,12 @@ export default function Navbar() {
                 <div className="bg-primary-100 text-primary-800 px-4 py-2 rounded-xl text-sm font-medium">
                   {userName.split(" ")[0]}
                 </div>
-                <form action={logout}>
-                  <button
-                    type="submit"
-                    onClick={handleClientLogout}
-                    className="ml-2 p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </button>
-                </form>
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
             )}
           </div>
@@ -212,15 +201,12 @@ export default function Navbar() {
                     <div>
                       <p className="font-medium text-gray-900">{userName}</p>
                     </div>
-                    <form action={logout} className="ml-auto">
-                      <button
-                        type="submit"
-                        onClick={handleClientLogout}
-                        className="p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
-                      >
-                        <LogOut className="h-5 w-5" />
-                      </button>
-                    </form>
+                    <button
+                      onClick={handleLogout}
+                      className="ml-auto p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-50 rounded-full"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </button>
                   </div>
                 </motion.div>
               )}

@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import { Providers } from "./providers"
 import Navbar from "../components/layout/Navbar"
 import Footer from "../components/layout/Footer"
+import CookieDebugger from "@/components/debug/CookieDebugger"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
             <Navbar />
             <main className="flex-grow bg-white">{children}</main>
             <Footer />
+            {process.env.NODE_ENV !== "production" && <CookieDebugger />}
           </div>
         </Providers>
       </body>
