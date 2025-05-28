@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, Tag, TrendingDown, Percent } from "lucide-react"
 
 export default function SimpleHeroSection() {
   const router = useRouter()
@@ -42,22 +42,73 @@ export default function SimpleHeroSection() {
             className="flex justify-center"
           >
             <div className="relative w-full max-w-md">
-              <div className="bg-white rounded-full p-8 shadow-xl">
-                <ShoppingCart className="w-full h-full text-primary-500" />
-              </div>
               <motion.div
-                className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full p-4 shadow-lg"
+                className="bg-white rounded-2xl p-8 shadow-xl"
                 animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 6, ease: "easeInOut" }}
+              >
+                <div className="relative">
+                  <ShoppingCart className="w-32 h-32 mx-auto text-primary-500" />
+
+                  <motion.div
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-3 shadow-lg"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
+                  >
+                    <Percent className="h-6 w-6" />
+                  </motion.div>
+
+                  <motion.div
+                    className="absolute bottom-0 left-0 bg-green-500 text-white rounded-full p-3 shadow-lg"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 0.5 }}
+                  >
+                    <TrendingDown className="h-6 w-6" />
+                  </motion.div>
+
+                  <motion.div
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 bg-primary-500 text-white rounded-full p-3 shadow-lg"
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 1 }}
+                  >
+                    <Tag className="h-6 w-6" />
+                  </motion.div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <motion.div
+                    className="inline-block bg-primary-100 text-primary-800 px-4 py-2 rounded-full font-bold text-lg"
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 1.5 }}
+                  >
+                    Risparmia fino al 30%
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Floating elements */}
+              <motion.div
+                className="absolute -top-4 -right-4 bg-yellow-400 text-white rounded-full p-4 shadow-lg"
+                animate={{ y: [0, -15, 0] }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 3, delay: 0.2 }}
               >
                 <span className="text-xl font-bold">-30%</span>
               </motion.div>
+
               <motion.div
-                className="absolute -bottom-4 -left-4 bg-green-500 text-white rounded-full p-4 shadow-lg"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 0.5 }}
+                className="absolute -bottom-4 -left-4 bg-green-600 text-white rounded-full p-4 shadow-lg"
+                animate={{ y: [0, 15, 0] }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 3, delay: 0.7 }}
               >
                 <span className="text-xl font-bold">€€€</span>
+              </motion.div>
+
+              <motion.div
+                className="absolute top-1/2 -right-8 transform -translate-y-1/2 bg-blue-500 text-white rounded-full p-3 shadow-lg"
+                animate={{ x: [0, 10, 0] }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 3, delay: 1.2 }}
+              >
+                <span className="text-lg font-bold">2x1</span>
               </motion.div>
             </div>
           </motion.div>
