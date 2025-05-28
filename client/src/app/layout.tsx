@@ -2,7 +2,8 @@ import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { Providers } from "./providers"
+// Rimuoviamo temporaneamente il Provider
+// import { Providers } from "./providers"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 
@@ -21,13 +22,14 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body className={inter.className}>
-        <Providers>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow bg-white">{children}</main>
-            <Footer />
-          </div>
-        </Providers>
+        {/* Rimuoviamo temporaneamente il Provider */}
+        {/* <Providers> */}
+        <div className="flex flex-col min-h-screen">
+          <Navbar />
+          <main className="flex-grow bg-white">{children}</main>
+          <Footer />
+        </div>
+        {/* </Providers> */}
       </body>
     </html>
   )
