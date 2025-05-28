@@ -8,7 +8,7 @@ const protectedRoutes = ["/dashboard", "/profile"]
 const authRoutes = ["/login", "/register"]
 
 // Public routes that are always accessible
-const publicRoutes = ["/", "/offers", "/search"]
+const publicRoutes = ["/", "/offers", "/search", "/logout"]
 
 export function middleware(request: NextRequest) {
   // Get token from cookies or authorization header
@@ -16,6 +16,11 @@ export function middleware(request: NextRequest) {
 
   // Get the current path
   const path = request.nextUrl.pathname
+
+  // Special case for logout page - always accessible
+  if (path === "/logout") {
+    return NextResponse.next()
+  }
 
   // Check if the route is protected
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route))

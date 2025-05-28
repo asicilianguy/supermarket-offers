@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import Cookies from "js-cookie"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -66,15 +65,8 @@ export default function Navbar() {
   }
 
   const handleLogout = () => {
-    // Clear token from localStorage
-    localStorage.removeItem("token")
-
-    // Clear token from cookies - assicuriamoci di rimuovere il cookie correttamente
-    // Rimuovi con opzioni specifiche per garantire che venga eliminato correttamente
-    Cookies.remove("token", { path: "/" })
-
-    // Forza un hard refresh verso la pagina di login
-    window.location.href = "/login"
+    // Reindirizza alla pagina di logout dedicata
+    window.location.href = "/logout"
   }
 
   const navLinks = [
