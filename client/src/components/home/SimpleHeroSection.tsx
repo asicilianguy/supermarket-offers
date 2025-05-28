@@ -8,10 +8,15 @@ export default function SimpleHeroSection() {
   const router = useRouter()
 
   return (
-    <section className="relative bg-gradient-to-b from-primary-50 to-white overflow-hidden">
-      <div className="container mx-auto px-4 py-16 md:py-24">
+    <section className="relative bg-gradient-to-b from-blue-50 to-white overflow-hidden py-16 md:py-24">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center lg:text-left"
+          >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
               Risparmia sulla spesa, ogni giorno
             </h1>
@@ -19,16 +24,16 @@ export default function SimpleHeroSection() {
               RisparmiApp centralizza tutte le offerte dei supermercati che frequenti, aiutandoti a risparmiare tempo e
               denaro sulla tua spesa quotidiana.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button
                 onClick={() => router.push("/register")}
-                className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg shadow-md transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-md transition-colors"
               >
                 Inizia a risparmiare
               </button>
               <button
                 onClick={() => router.push("/offers")}
-                className="bg-white hover:bg-gray-50 text-primary-600 font-medium py-3 px-6 rounded-lg shadow-md border border-gray-200 transition-colors"
+                className="bg-white hover:bg-gray-50 text-blue-600 font-medium py-3 px-6 rounded-lg shadow-md border border-gray-200 transition-colors"
               >
                 Scopri le offerte
               </button>
@@ -48,7 +53,7 @@ export default function SimpleHeroSection() {
                 transition={{ repeat: Number.POSITIVE_INFINITY, duration: 6, ease: "easeInOut" }}
               >
                 <div className="relative">
-                  <ShoppingCart className="w-32 h-32 mx-auto text-primary-500" />
+                  <ShoppingCart className="w-32 h-32 mx-auto text-blue-500" />
 
                   <motion.div
                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-3 shadow-lg"
@@ -67,7 +72,7 @@ export default function SimpleHeroSection() {
                   </motion.div>
 
                   <motion.div
-                    className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 bg-primary-500 text-white rounded-full p-3 shadow-lg"
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 bg-blue-500 text-white rounded-full p-3 shadow-lg"
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 1 }}
                   >
@@ -77,7 +82,7 @@ export default function SimpleHeroSection() {
 
                 <div className="mt-6 text-center">
                   <motion.div
-                    className="inline-block bg-primary-100 text-primary-800 px-4 py-2 rounded-full font-bold text-lg"
+                    className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold text-lg"
                     animate={{ y: [0, -5, 0] }}
                     transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2, delay: 1.5 }}
                   >
@@ -114,8 +119,6 @@ export default function SimpleHeroSection() {
           </motion.div>
         </div>
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent"></div>
     </section>
   )
 }

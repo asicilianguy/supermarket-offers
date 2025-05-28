@@ -8,9 +8,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["via.placeholder.com"],
+    domains: ['via.placeholder.com'],
     unoptimized: true,
   },
 }
 
-module.exports = nextConfig
+export default nextConfig

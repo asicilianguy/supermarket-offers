@@ -1,7 +1,7 @@
 import type React from "react"
+import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
 import { Providers } from "./providers"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it">
-      <body className={inter.className}>
+      <body className={`${inter.className} min-h-screen bg-white`}>
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Navbar />
