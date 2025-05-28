@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { useGetUserProfileQuery } from "@/redux/features/user/userApiSlice"
 import { Menu, X } from "lucide-react"
+import { useGetUserProfileQuery } from "@/redux/features/user/userApiSlice"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -17,7 +16,8 @@ export default function Navbar() {
   })
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
+    // Check if user is logged in
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     setIsLoggedIn(!!token)
   }, [])
 
@@ -44,9 +44,9 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-blue-600 font-bold text-xl">RisparmiApp</span>
@@ -58,11 +58,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? "text-blue-600 bg-blue-50"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                }`}
+                className={pathname === link.href ? "nav-link nav-link-active" : "nav-link nav-link-inactive"}
               >
                 {link.name}
               </Link>
@@ -81,7 +77,7 @@ export default function Navbar() {
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-              aria-expanded={isOpen}
+              aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
@@ -94,40 +90,29 @@ export default function Navbar() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="md:hidden bg-white border-t border-gray-200"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    pathname === link.href
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                  }`}
-                  onClick={closeMenu}
-                >
-                  {link.name}
-                </Link>
-              ))}
+      {/* Mobile menu */}
+      {isOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={
+                  pathname === link.href ? "nav-link nav-link-active block" : "nav-link nav-link-inactive block"
+                }
+                onClick={closeMenu}
+              >
+                {link.name}
+              </Link>
+            ))}
 
-              {isLoggedIn && user && (
-                <div className="px-3 py-2 text-sm font-medium text-gray-700 border-t border-gray-200 mt-2">
-                  Benvenuto, {user.name.split(" ")[0]}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {isLoggedIn && user && (
+              <div className="px-3 py-2 text-sm font-medium text-gray-700">Benvenuto, {user.name.split(" ")[0]}</div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
