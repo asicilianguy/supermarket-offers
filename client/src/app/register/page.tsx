@@ -48,7 +48,8 @@ export default function Register() {
     })
   }
 
-  const nextStep = () => {
+  const nextStep = (e: React.FormEvent) => {
+    e.preventDefault()
     if (step === 1) {
       // Validate first step
       if (!formData.name || !formData.phoneNumber || !formData.password || !formData.confirmPassword) {
@@ -113,7 +114,7 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center py-6 px-4 sm:py-12 bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center py-6 px-4 sm:py-12 bg-dark-50">
       <motion.div
         className="w-full max-w-md card-stacked"
         initial={{ opacity: 0, y: 20 }}
@@ -310,12 +311,12 @@ export default function Register() {
               )}
 
               <motion.button
-                type={step === totalSteps ? "submit" : "button"}
+                type="submit"
                 disabled={isLoading}
                 className={`flex items-center justify-center px-4 py-2 rounded-xl border border-transparent text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 ${
                   step === totalSteps
-                    ? "bg-primary-600 text-white hover:bg-primary-700"
-                    : "bg-primary-600 text-white hover:bg-primary-700"
+                    ? "bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:from-primary-700 hover:to-secondary-700"
+                    : "bg-gradient-to-r from-primary-600 to-accent-500 text-white hover:from-primary-700 hover:to-accent-600"
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
