@@ -4,8 +4,6 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
-// Modifichiamo l'importazione per utilizzare un percorso relativo
-import { useGetUserProfileQuery } from "../../redux/features/user/userApiSlice"
 import { motion, AnimatePresence } from "framer-motion"
 import Cookies from "js-cookie"
 
@@ -15,10 +13,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-
-  const { data: user } = useGetUserProfileQuery(undefined, {
-    skip: !isLoggedIn,
-  })
+  const [userName, setUserName] = useState<string | null>(null)
 
   useEffect(() => {
     // Check if user is logged in
@@ -37,6 +32,30 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  // Fetch user data only if logged in
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (isLoggedIn) {
+        try {
+          const token = localStorage.getItem("token")
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/profile`, {
+            headers: {
+              "x-auth-token": token || "",
+            },
+          })
+          if (response.ok) {
+            const userData = await response.json()
+            setUserName(userData.name)
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error)
+        }
+      }
+    }
+
+    fetchUserData()
+  }, [isLoggedIn])
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -119,10 +138,10 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {isLoggedIn && user && (
+            {isLoggedIn && userName && (
               <div className="ml-4 flex items-center">
                 <div className="bg-primary-100 text-primary-800 px-4 py-2 rounded-xl text-sm font-medium">
-                  {user.name.split(" ")[0]}
+                  {userName.split(" ")[0]}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -179,15 +198,14 @@ export default function Navbar() {
                 </motion.div>
               ))}
 
-              {isLoggedIn && user && (
+              {isLoggedIn && userName && (
                 <motion.div className="mt-auto border-t border-gray-100 pt-4 pb-8" variants={mobileItemVariants}>
                   <div className="flex items-center p-4 bg-primary-50 rounded-xl">
                     <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
                       <User className="h-5 w-5 text-primary-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.phoneNumber}</p>
+                      <p className="font-medium text-gray-900">{userName}</p>
                     </div>
                     <button
                       onClick={handleLogout}
