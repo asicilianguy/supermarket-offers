@@ -8,7 +8,7 @@ export default function SimpleHeroSection() {
   const router = useRouter()
 
   return (
-    <div className="relative bg-gradient-to-b from-primary-50 to-white overflow-hidden">
+    <section className="relative bg-gradient-to-b from-primary-50 to-white overflow-hidden">
       <div className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
@@ -116,6 +116,6 @@ export default function SimpleHeroSection() {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent"></div>
-    </div>
+    </section>
   )
 }
