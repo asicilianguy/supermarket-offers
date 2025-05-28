@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Menu, X, ShoppingCart, Home, Tag, Search, User, LogOut } from "lucide-react"
-import { useGetUserProfileQuery } from "@/redux/features/user/userApiSlice"
+// Modifichiamo l'importazione per utilizzare un percorso relativo
+import { useGetUserProfileQuery } from "../../redux/features/user/userApiSlice"
 import { motion, AnimatePresence } from "framer-motion"
 import Cookies from "js-cookie"
 

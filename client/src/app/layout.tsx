@@ -4,8 +4,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 // Rimuoviamo temporaneamente il Provider
 // import { Providers } from "./providers"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
+import Navbar from "../components/layout/Navbar"
+import Footer from "../components/layout/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
