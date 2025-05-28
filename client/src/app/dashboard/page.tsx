@@ -13,7 +13,7 @@ import SupermarketOffers from "@/components/dashboard/SupermarketOffers"
 
 export default function Dashboard() {
   const router = useRouter()
-  const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useGetUserProfileQuery()
+  const { data: user, isLoading: isLoadingUser, isError: isErrorUser } = useGetUserProfileQuery(undefined)
   const { data: shoppingListOffers, isLoading: isLoadingOffers } = useGetOffersForShoppingListQuery(undefined, {
     skip: !user,
   })

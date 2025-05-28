@@ -1,87 +1,99 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { useGetUserProfileQuery, useUpdateFrequentedSupermarketsMutation } from "@/redux/features/user/userApiSlice"
-import SupermarketSelector from "@/components/auth/SupermarketSelector"
-import { SUPERMARKETS } from "@/constants/supermarkets"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  useGetUserProfileQuery,
+  useUpdateFrequentedSupermarketsMutation,
+} from "@/redux/features/user/userApiSlice";
+import SupermarketSelector from "@/components/auth/SupermarketSelector";
+import { SUPERMARKETS } from "@/constants/supermarkets";
 
 export default function Profile() {
-  const router = useRouter()
-  const { data: user, isLoading, isError } = useGetUserProfileQuery()
-  const [updateSupermarkets, { isLoading: isUpdating }] = useUpdateFrequentedSupermarketsMutation()
+  const router = useRouter();
+  const { data: user, isLoading, isError } = useGetUserProfileQuery(undefined);
+  const [updateSupermarkets, { isLoading: isUpdating }] =
+    useUpdateFrequentedSupermarketsMutation();
 
-  const [selectedSupermarkets, setSelectedSupermarkets] = useState<string[]>([])
-  const [successMessage, setSuccessMessage] = useState("")
-  const [error, setError] = useState("")
+  const [selectedSupermarkets, setSelectedSupermarkets] = useState<string[]>(
+    []
+  );
+  const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Check if user is authenticated
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login")
+      router.push("/login");
     }
 
     // Set selected supermarkets when user data is loaded
     if (user) {
-      setSelectedSupermarkets(user.frequentedSupermarkets)
+      setSelectedSupermarkets(user.frequentedSupermarkets);
     }
-  }, [user, router])
+  }, [user, router]);
 
   const handleSupermarketChange = (supermarkets: string[]) => {
-    setSelectedSupermarkets(supermarkets)
-  }
+    setSelectedSupermarkets(supermarkets);
+  };
 
   const handleSelectAll = () => {
-    setSelectedSupermarkets([...SUPERMARKETS])
-  }
+    setSelectedSupermarkets([...SUPERMARKETS]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setSuccessMessage("")
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
 
     if (selectedSupermarkets.length === 0) {
-      setError("Seleziona almeno un supermercato")
-      return
+      setError("Seleziona almeno un supermercato");
+      return;
     }
 
     try {
-      await updateSupermarkets({ frequentedSupermarkets: selectedSupermarkets }).unwrap()
-      setSuccessMessage("Supermercati aggiornati con successo")
+      await updateSupermarkets({
+        frequentedSupermarkets: selectedSupermarkets,
+      }).unwrap();
+      setSuccessMessage("Supermercati aggiornati con successo");
 
       // Clear success message after 3 seconds
       setTimeout(() => {
-        setSuccessMessage("")
-      }, 3000)
+        setSuccessMessage("");
+      }, 3000);
     } catch (err: any) {
-      setError(err.data?.message || "Errore durante l'aggiornamento")
+      setError(err.data?.message || "Errore durante l'aggiornamento");
     }
-  }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("token")
-    router.push("/login")
-  }
+    localStorage.removeItem("token");
+    document.cookie.split(";").forEach((cookie) => {
+      const [name] = cookie.trim().split("=");
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+    router.push("/login");
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
       </div>
-    )
+    );
   }
 
   if (isError) {
-    router.push("/login")
-    return null
+    router.push("/login");
+    return null;
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -102,7 +114,8 @@ export default function Profile() {
                 <span className="font-medium">Nome:</span> {user.name}
               </p>
               <p>
-                <span className="font-medium">Numero di telefono:</span> {user.phoneNumber}
+                <span className="font-medium">Numero di telefono:</span>{" "}
+                {user.phoneNumber}
               </p>
             </div>
           </div>
@@ -117,16 +130,22 @@ export default function Profile() {
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <div
+              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-6"
+              role="alert"
+            >
               <span className="block sm:inline">{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <h2 className="text-lg font-medium mb-2">Supermercati frequentati</h2>
+              <h2 className="text-lg font-medium mb-2">
+                Supermercati frequentati
+              </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Seleziona i supermercati che frequenti abitualmente per ricevere offerte personalizzate.
+                Seleziona i supermercati che frequenti abitualmente per ricevere
+                offerte personalizzate.
               </p>
 
               <button
@@ -137,7 +156,10 @@ export default function Profile() {
                 Seleziona tutti
               </button>
 
-              <SupermarketSelector selectedSupermarkets={selectedSupermarkets} onChange={handleSupermarketChange} />
+              <SupermarketSelector
+                selectedSupermarkets={selectedSupermarkets}
+                onChange={handleSupermarketChange}
+              />
             </div>
 
             <div className="flex justify-between">
@@ -161,5 +183,5 @@ export default function Profile() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }
