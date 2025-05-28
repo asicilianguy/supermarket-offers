@@ -4,48 +4,126 @@
 
 @layer base {
   :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 250, 250, 250;
+    --foreground-rgb: 18, 48, 83;
+    --background-start-rgb: 248, 250, 252;
     --background-end-rgb: 255, 255, 255;
   }
 
   body {
     color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-start-rgb));
+    background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
   }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-colors;
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700;
+    @apply bg-primary-600 text-white hover:bg-primary-700 shadow-md hover:shadow-lg focus:ring-primary-500;
   }
 
   .btn-secondary {
-    @apply bg-white text-primary-600 border border-gray-200 hover:bg-gray-50;
+    @apply bg-white text-primary-700 border border-primary-200 hover:bg-primary-50 hover:border-primary-300 focus:ring-primary-500;
+  }
+
+  .btn-accent {
+    @apply bg-accent-500 text-white hover:bg-accent-600 shadow-md hover:shadow-lg focus:ring-accent-500;
   }
 
   .card {
-    @apply bg-white rounded-lg shadow-md overflow-hidden;
+    @apply bg-white rounded-2xl shadow-card hover:shadow-hover transition-shadow duration-300 overflow-hidden;
+  }
+
+  .input-wrapper {
+    @apply relative;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500;
+    @apply w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all duration-200;
+  }
+
+  .input-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .nav-container {
+    @apply container mx-auto px-4 flex items-center justify-between;
+  }
+
+  .nav-brand {
+    @apply text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors;
   }
 
   .nav-link {
-    @apply px-3 py-2 rounded-md text-sm font-medium;
+    @apply px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200;
   }
 
   .nav-link-active {
-    @apply text-primary-600 bg-primary-50;
+    @apply text-primary-700 bg-primary-50;
   }
 
   .nav-link-inactive {
     @apply text-gray-700 hover:text-primary-600 hover:bg-gray-50;
+  }
+
+  .section {
+    @apply py-16 md:py-24;
+  }
+
+  .section-title {
+    @apply text-center mb-12;
+  }
+
+  .section-title h2 {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+  }
+
+  .section-title p {
+    @apply text-xl text-gray-700 max-w-3xl mx-auto;
+  }
+
+  .feature-card {
+    @apply bg-white p-6 rounded-2xl shadow-soft hover:shadow-hover transition-all duration-300 border border-gray-100 hover:border-primary-100;
+  }
+
+  .feature-icon {
+    @apply mb-4 p-3 rounded-xl bg-primary-50 text-primary-600 inline-block;
+  }
+
+  .checkbox-wrapper {
+    @apply flex items-center p-3 rounded-xl cursor-pointer transition-colors;
+  }
+
+  .checkbox-selected {
+    @apply bg-primary-50 border border-primary-200;
+  }
+
+  .checkbox-unselected {
+    @apply bg-gray-50 border border-gray-200 hover:bg-gray-100;
   }
 }
 
@@ -56,6 +134,14 @@
 
 .animate-slide-up {
   animation: slideUp 0.5s ease-in-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes fadeIn {
@@ -75,5 +161,15 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }

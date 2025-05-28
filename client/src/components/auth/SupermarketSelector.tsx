@@ -1,5 +1,6 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { SUPERMARKETS } from "@/constants/supermarkets"
 
 interface SupermarketSelectorProps {
@@ -18,18 +19,19 @@ export default function SupermarketSelector({ selectedSupermarkets, onChange }: 
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-      {SUPERMARKETS.map((supermarket) => (
-        <div
+      {SUPERMARKETS.map((supermarket, index) => (
+        <motion.div
           key={supermarket}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.03 }}
           className={`
-            flex items-center p-3 rounded-md cursor-pointer transition-colors
-            ${
-              selectedSupermarkets.includes(supermarket)
-                ? "bg-primary-100 border border-primary-300"
-                : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
-            }
+            checkbox-wrapper
+            ${selectedSupermarkets.includes(supermarket) ? "checkbox-selected" : "checkbox-unselected"}
           `}
           onClick={() => handleToggle(supermarket)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           <input
             type="checkbox"
@@ -38,7 +40,7 @@ export default function SupermarketSelector({ selectedSupermarkets, onChange }: 
             className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
           />
           <label className="ml-2 block text-sm capitalize">{supermarket}</label>
-        </div>
+        </motion.div>
       ))}
     </div>
   )

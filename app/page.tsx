@@ -1,7 +1,7 @@
 "use client"
 
-import Footer from "../client/src/components/layout/Footer"
+import FeaturesSection from "../client/src/components/home/FeaturesSection"
 
 export default function SyntheticV0PageForDeployment() {
-  return <Footer />
+  return <FeaturesSection />
 }
