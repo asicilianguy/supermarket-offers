@@ -70,8 +70,8 @@ export default function Navbar() {
     localStorage.removeItem("token")
     Cookies.remove("token")
 
-    // Redirect to login page
-    window.location.href = "/login"
+    // Forza un hard refresh per assicurarsi che tutti gli stati vengano resettati
+    window.location.href = "/"
   }
 
   const navLinks = [
