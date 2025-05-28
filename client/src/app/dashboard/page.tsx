@@ -21,7 +21,10 @@ export default function Dashboard() {
   useEffect(() => {
     // Check if user is authenticated
     const token = localStorage.getItem("token")
+    console.log("Dashboard - Token check:", token ? "Token exists" : "No token")
+
     if (!token) {
+      console.log("No token found, redirecting to login")
       router.push("/login")
     }
   }, [router])

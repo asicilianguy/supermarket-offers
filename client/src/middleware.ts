@@ -10,7 +10,8 @@ export function middleware(request: NextRequest) {
 
   // If it's a protected route, check for the token
   if (isProtectedRoute) {
-    const token = request.cookies.get("token")?.value
+    // Get token from cookies or authorization header
+    const token = request.cookies.get("token")?.value || request.headers.get("authorization")?.split(" ")[1]
 
     // If no token is found, redirect to login
     if (!token) {

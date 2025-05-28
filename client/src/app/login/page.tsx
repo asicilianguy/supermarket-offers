@@ -46,8 +46,12 @@ export default function Login() {
       // Store token in localStorage
       localStorage.setItem("token", result.token)
 
-      // Redirect to dashboard
-      router.push("/dashboard")
+      console.log("Login successful, token saved:", result.token)
+
+      // Redirect to dashboard with a slight delay to ensure localStorage is updated
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 100)
     } catch (err: any) {
       setError(err.data?.message || "Credenziali non valide")
     }
