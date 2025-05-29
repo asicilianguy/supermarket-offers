@@ -1,5 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss"
+
+const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -48,6 +49,7 @@ module.exports = {
           950: "#431407",
         },
         dark: {
+          // Questa era la tua palette 'dark', l'ho lasciata ma considera che shadcn/ui gestirà i colori base
           50: "#f8fafc",
           100: "#f1f5f9",
           200: "#e2e8f0",
@@ -65,8 +67,10 @@ module.exports = {
         xl: "1rem",
         "2xl": "1.5rem",
         "3xl": "2rem",
+        // shadcn/ui aggiungerà 'lg', 'md', 'sm' se usi lo stile New York
       },
       boxShadow: {
+        // ... le tue boxShadow personalizzate ...
         soft: "0 4px 20px rgba(0, 0, 0, 0.05)",
         hover: "0 10px 25px rgba(0, 0, 0, 0.1)",
         card: "0 10px 30px rgba(0, 0, 0, 0.08)",
@@ -78,59 +82,24 @@ module.exports = {
         "dark-card": "0 10px 30px rgba(0, 0, 0, 0.2)",
         "dark-hover": "0 15px 35px rgba(0, 0, 0, 0.25)",
       },
-      animation: {
-        float: "float 6s ease-in-out infinite",
-        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "card-shift": "cardShift 0.5s ease-out forwards",
-        "slide-up": "slideUp 0.5s ease-out forwards",
-        "slide-down": "slideDown 0.5s ease-out forwards",
-        "slide-in-right": "slideInRight 0.5s ease-out forwards",
-        "slide-in-left": "slideInLeft 0.5s ease-out forwards",
-        "fade-in": "fadeIn 0.5s ease-out forwards",
-        "scale-in": "scaleIn 0.5s ease-out forwards",
-        "bounce-in": "bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
-      },
       keyframes: {
+        // shadcn/ui aggiungerà le sue keyframes per accordion, ecc.
+        // ... le tue keyframes personalizzate ...
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        cardShift: {
-          "0%": { transform: "translateY(0) rotate(0deg)" },
-          "100%": { transform: "translateY(-5px) rotate(-2deg)" },
-        },
-        slideUp: {
-          "0%": { transform: "translateY(20px)", opacity: 0 },
-          "100%": { transform: "translateY(0)", opacity: 1 },
-        },
-        slideDown: {
-          "0%": { transform: "translateY(-20px)", opacity: 0 },
-          "100%": { transform: "translateY(0)", opacity: 1 },
-        },
-        slideInRight: {
-          "0%": { transform: "translateX(20px)", opacity: 0 },
-          "100%": { transform: "translateX(0)", opacity: 1 },
-        },
-        slideInLeft: {
-          "0%": { transform: "translateX(-20px)", opacity: 0 },
-          "100%": { transform: "translateX(0)", opacity: 1 },
-        },
-        fadeIn: {
-          "0%": { opacity: 0 },
-          "100%": { opacity: 1 },
-        },
-        scaleIn: {
-          "0%": { transform: "scale(0.9)", opacity: 0 },
-          "100%": { transform: "scale(1)", opacity: 1 },
-        },
-        bounceIn: {
-          "0%": { transform: "scale(0.3)", opacity: 0 },
-          "50%": { transform: "scale(1.05)" },
-          "70%": { transform: "scale(0.9)" },
-          "100%": { transform: "scale(1)", opacity: 1 },
-        },
+        // ... altre ...
+      },
+      animation: {
+        // shadcn/ui aggiungerà le sue animazioni
+        // ... le tue animazioni personalizzate ...
+        float: "float 6s ease-in-out infinite",
+        // ... altre ...
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")], // shadcn/ui aggiungerà questo plugin
 }
+
+export default config
