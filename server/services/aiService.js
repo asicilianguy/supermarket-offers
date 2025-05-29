@@ -88,16 +88,18 @@ async function analyzeProductImage(base64Image, storeName = null) {
     promptText += "\n- productName";
     promptText +=
       "\n- productQuantity (se presente) (con l'unità di misura dopo il numero se possibile)";
-    promptText += "\n- offerPrice";
-    promptText += "\n- previousPrice (se presente)";
+    promptText +=
+      "\n- offerPrice, da indicare come numero con due decimali massimo dopo la virgola";
+    promptText +=
+      "\n- previousPrice (se presente),  da indicare come numero con due decimali massimo dopo la virgola";
     promptText +=
       "\n- discountPercentage (se presente e calcolabile), come numero intero tra 0 e 100";
 
     // Richiedi di distinguere tra pricePerKg o pricePerLiter a seconda del tipo di prodotto
     promptText +=
-      "\n- pricePerKg (solo se è un prodotto solido e il prezzo al kg è indicato)";
+      "\n- pricePerKg (solo se è un prodotto solido e il prezzo al kg è indicato) da indicare come numero con due decimali massimo dopo la virgola";
     promptText +=
-      "\n- pricePerLiter (solo se è un prodotto liquido e il prezzo al litro è indicato)";
+      "\n- pricePerLiter (solo se è un prodotto liquido e il prezzo al litro è indicato)  da indicare come numero con due decimali massimo dopo la virgola";
 
     // Richiedi entrambe le date nel formato specifico
     promptText += "\n- offerStartDate (in formato dd-mm-yyyy)";

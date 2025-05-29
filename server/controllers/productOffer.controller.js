@@ -311,7 +311,12 @@ export const batchInsertOffers = async (req, res) => {
 
     console.log(`Validazione di ${productsInfo.length} prodotti...`);
 
-    const validatedProducts = productsInfo.map((product) => {
+    // Arrays to track valid products and validation errors
+    const validProducts = [];
+    const invalidProducts = [];
+
+    // Pre-validate each product individually
+    for (const product of productsInfo) {
       const validatedProduct = { ...product };
 
       // Imposta supermarketAisle a un valore valido forzato
@@ -338,44 +343,49 @@ export const batchInsertOffers = async (req, res) => {
       validatedProduct.offerStartDate = defaultStartDate;
       validatedProduct.offerEndDate = defaultEndDate;
 
-      return validatedProduct;
-    });
+      // Validate using Mongoose's synchronous validation
+      try {
+        const productModel = new ProductOffer(validatedProduct);
+        const validationError = productModel.validateSync();
 
-    // Prova a inserire un singolo prodotto per debug
-    try {
-      const singleProduct = new ProductOffer(validatedProducts[0]);
-      const validationError = singleProduct.validateSync();
-
-      if (validationError) {
-        console.error("Errore di validazione:", validationError);
-        return res.status(400).json({
-          success: false,
-          message: "Validation error on sample product",
-          errors: validationError.errors,
+        if (validationError) {
+          // Product failed validation - add to invalid list
+          invalidProducts.push({
+            product: validatedProduct,
+            errors: validationError.errors,
+          });
+        } else {
+          // Product is valid - add to valid list
+          validProducts.push(validatedProduct);
+        }
+      } catch (error) {
+        // Unexpected error during validation
+        invalidProducts.push({
+          product: validatedProduct,
+          errors: { unexpected: error.message },
         });
       }
+    }
 
-      // Salva il singolo prodotto
-      const savedProduct = await singleProduct.save();
-      console.log("Prodotto singolo salvato con successo:", savedProduct._id);
+    console.log(
+      `Prodotti validi: ${validProducts.length}, Prodotti non validi: ${invalidProducts.length}`
+    );
 
-      // Se funziona, prova il batch
-      console.log("Tentativo di inserimento batch...");
-    } catch (singleError) {
-      console.error(
-        "Errore nel salvataggio del prodotto singolo:",
-        singleError
-      );
+    if (validProducts.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Error saving sample product",
-        error: singleError.message,
+        message: "No valid products to insert",
+        invalidCount: invalidProducts.length,
+        sampleErrors: invalidProducts.map((p) => ({
+          productName: p.product.productName,
+          errors: p.errors,
+        })),
       });
     }
 
-    // Insert all products in batch
+    // Insert only the valid products
     try {
-      const result = await ProductOffer.insertMany(validatedProducts, {
+      const result = await ProductOffer.insertMany(validProducts, {
         ordered: false, // Continue inserting even if some fail
       });
 
@@ -383,14 +393,21 @@ export const batchInsertOffers = async (req, res) => {
 
       res.json({
         success: true,
-        message: `Successfully inserted ${result.length} offers`,
+        message: `Successfully inserted ${result.length} offers. Skipped ${invalidProducts.length} invalid products.`,
         insertedCount: result.length,
-        failedCount: validatedProducts.length - result.length,
+        skippedCount: invalidProducts.length,
+        // Include sample of skipped products for debugging
+        sampleSkipped: invalidProducts.map((p) => ({
+          productName: p.product.productName,
+          errors: Object.keys(p.errors).map(
+            (key) => `${key}: ${p.errors[key].message}`
+          ),
+        })),
       });
     } catch (batchError) {
       console.error("Errore batch completo:", batchError);
 
-      // Cerca di estrarre informazioni dettagliate sugli errori
+      // Extract info about errors
       let insertedCount = 0;
       let detailedErrors = [];
 
@@ -410,8 +427,15 @@ export const batchInsertOffers = async (req, res) => {
         success: false,
         message: "Partial insert success",
         insertedCount: insertedCount,
-        failedCount: validatedProducts.length - insertedCount,
-        detailedErrors: detailedErrors.slice(0, 10), // Primi 10 errori
+        skippedDueToValidation: invalidProducts.length,
+        failedDuringInsert: validProducts.length - insertedCount,
+        detailedErrors: detailedErrors, // First 10 errors
+        sampleSkipped: invalidProducts.map((p) => ({
+          productName: p.product.productName,
+          errors: Object.keys(p.errors).map(
+            (key) => `${key}: ${p.errors[key].message}`
+          ),
+        })),
       });
     }
   } catch (err) {

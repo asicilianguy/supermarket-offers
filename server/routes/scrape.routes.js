@@ -51,9 +51,9 @@ const SUPERMARKETS = [
 const scraperMap = {
   esselunga: esselungaScraper,
   conad: conadScraper,
-  lidl: lidlScraper,
-  eurospin: eurospinScraper,
-  bennet: bennetScraper,
+  lidl: lidlScraper, //done
+  eurospin: eurospinScraper, //done
+  bennet: bennetScraper, //done
   auchan: auchanScraper,
   penny: pennyScraper,
   despar: desparScraper,
@@ -65,9 +65,9 @@ const scraperMap = {
   gigante: giganteScraper,
   ins: insScraper,
   todis: todisScraper,
-  md: mdScraper,
+  md: mdScraper, //done
   crai: craiScraper,
-  paghipoco: paghipocoScraper,
+  paghipoco: paghipocoScraper, //done
 }
 
 // Definizione delle route per ogni supermercato
