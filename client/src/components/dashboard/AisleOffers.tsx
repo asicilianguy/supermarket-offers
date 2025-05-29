@@ -1,10 +1,11 @@
 "use client"
 
-import { Card, CardBody, CardHeader } from "@heroui/react"
-import { Chip } from "@heroui/react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useGetOffersByAisleQuery } from "@/redux/features/productOffer/productOfferApiSlice"
 import { ShoppingCart } from "lucide-react"
 import Link from "next/link"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface AisleOffersProps {
   aisle: string
@@ -20,22 +21,20 @@ export default function AisleOffers({ aisle, limit = 4 }: AisleOffersProps) {
 
   if (isLoading) {
     return (
-      <Card className="w-full">
-        <CardHeader className="flex gap-3">
+      <Card>
+        <CardHeader>
           <div className="flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
-            <div className="flex flex-col">
-              <p className="text-md font-semibold capitalize">{aisle}</p>
-            </div>
+            <h4 className="text-md font-semibold capitalize">{aisle}</h4>
           </div>
         </CardHeader>
-        <CardBody>
-          <div className="animate-pulse space-y-2">
+        <CardContent>
+          <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 bg-gray-200 rounded"></div>
+              <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
     )
   }
@@ -43,16 +42,14 @@ export default function AisleOffers({ aisle, limit = 4 }: AisleOffersProps) {
   const offers = data?.offers || []
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex gap-3">
+    <Card hover>
+      <CardHeader>
         <div className="flex items-center gap-2">
-          <ShoppingCart className="h-4 w-4" />
-          <div className="flex flex-col">
-            <p className="text-md font-semibold capitalize">{aisle}</p>
-          </div>
+          <ShoppingCart className="h-4 w-4 text-primary-600" />
+          <h4 className="text-md font-semibold capitalize">{aisle}</h4>
         </div>
       </CardHeader>
-      <CardBody>
+      <CardContent>
         {offers.length === 0 ? (
           <p className="text-sm text-gray-500">Nessuna offerta disponibile</p>
         ) : (
@@ -64,11 +61,11 @@ export default function AisleOffers({ aisle, limit = 4 }: AisleOffersProps) {
                   <p className="text-xs text-gray-500">{offer.chainName}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-primary">€{offer.offerPrice.toFixed(2)}</p>
+                  <p className="text-sm font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
                   {offer.discountPercentage && (
-                    <Chip color="danger" size="sm">
+                    <Badge variant="danger" size="sm">
                       -{offer.discountPercentage}%
-                    </Chip>
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -77,11 +74,11 @@ export default function AisleOffers({ aisle, limit = 4 }: AisleOffersProps) {
         )}
         <Link
           href={`/offers?aisle=${encodeURIComponent(aisle)}`}
-          className="block mt-3 text-xs text-center text-primary hover:underline"
+          className="block mt-3 text-xs text-center text-primary-600 hover:underline"
         >
           Vedi tutte le offerte di {aisle}
         </Link>
-      </CardBody>
+      </CardContent>
     </Card>
   )
 }

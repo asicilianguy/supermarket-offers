@@ -1,12 +1,10 @@
 import type { Config } from "tailwindcss"
-import { heroui } from "@heroui/react"
 
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -90,69 +88,23 @@ const config: Config = {
             transform: "translateY(-10px)",
           },
         },
+        shimmer: {
+          from: {
+            backgroundPosition: "0 0",
+          },
+          to: {
+            backgroundPosition: "-200% 0",
+          },
+        },
       },
       animation: {
         float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2s linear infinite",
       },
     },
   },
   darkMode: "class",
-  plugins: [
-    heroui({
-      themes: {
-        light: {
-          colors: {
-            primary: {
-              50: "#fff1f2",
-              100: "#ffe4e6",
-              200: "#fecdd3",
-              300: "#fda4af",
-              400: "#fb7185",
-              500: "#f43f5e",
-              600: "#e11d48",
-              700: "#be123c",
-              800: "#9f1239",
-              900: "#881337",
-              DEFAULT: "#f43f5e",
-              foreground: "#ffffff",
-            },
-            secondary: {
-              50: "#fdf4ff",
-              100: "#fae8ff",
-              200: "#f5d0fe",
-              300: "#f0abfc",
-              400: "#e879f9",
-              500: "#d946ef",
-              600: "#c026d3",
-              700: "#a21caf",
-              800: "#86198f",
-              900: "#701a75",
-              DEFAULT: "#d946ef",
-              foreground: "#ffffff",
-            },
-          },
-        },
-        dark: {
-          colors: {
-            primary: {
-              50: "#4c0519",
-              100: "#881337",
-              200: "#9f1239",
-              300: "#be123c",
-              400: "#e11d48",
-              500: "#f43f5e",
-              600: "#fb7185",
-              700: "#fda4af",
-              800: "#fecdd3",
-              900: "#ffe4e6",
-              DEFAULT: "#f43f5e",
-              foreground: "#ffffff",
-            },
-          },
-        },
-      },
-    }),
-  ],
+  plugins: [],
 }
 
 export default config
