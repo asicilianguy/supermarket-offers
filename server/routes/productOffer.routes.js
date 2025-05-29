@@ -9,6 +9,7 @@ import {
   getOffersByBrand,
   getAllAisles,
   getAllBrands,
+  batchInsertOffers,
 } from "../controllers/productOffer.controller.js"
 import auth from "../middleware/auth.middleware.js"
 
@@ -58,5 +59,10 @@ router.get("/aisles", getAllAisles)
 // @desc    Get all available brands
 // @access  Public
 router.get("/brands", getAllBrands)
+
+// @route   POST api/offers/batch
+// @desc    Batch insert multiple offers (for scrapers only)
+// @access  Private - This route should be protected and not accessible from client
+router.post("/batch", batchInsertOffers)
 
 export default router

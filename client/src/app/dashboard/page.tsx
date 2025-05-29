@@ -4,12 +4,16 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useGetUserProfileQuery } from "@/redux/features/user/userApiSlice"
-import { useGetOffersForShoppingListQuery } from "@/redux/features/productOffer/productOfferApiSlice"
+import {
+  useGetOffersForShoppingListQuery,
+  useGetBestOffersQuery,
+} from "@/redux/features/productOffer/productOfferApiSlice"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import ShoppingList from "@/components/dashboard/ShoppingList"
 import OfferRecommendations from "@/components/dashboard/OfferRecommendations"
 import BestOffers from "@/components/dashboard/BestOffers"
 import SupermarketOffers from "@/components/dashboard/SupermarketOffers"
+import AisleOffers from "@/components/dashboard/AisleOffers"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -17,6 +21,7 @@ export default function Dashboard() {
   const { data: shoppingListOffers, isLoading: isLoadingOffers } = useGetOffersForShoppingListQuery(undefined, {
     skip: !user,
   })
+  const { data: bestOffers, isLoading: isLoadingBest } = useGetBestOffersQuery({ limit: 10 })
 
   useEffect(() => {
     // Check if user is authenticated
@@ -45,6 +50,9 @@ export default function Dashboard() {
   if (!user) {
     return null
   }
+
+  // Seleziona alcuni reparti popolari da mostrare nella dashboard
+  const popularAisles = ["frutta e verdura", "carne", "latticini", "bevande", "surgelati"]
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -76,7 +84,7 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <BestOffers />
+        <BestOffers offers={bestOffers || []} isLoading={isLoadingBest} />
       </motion.div>
 
       <motion.div
@@ -86,6 +94,28 @@ export default function Dashboard() {
         transition={{ duration: 0.5, delay: 0.6 }}
       >
         <SupermarketOffers frequentedSupermarkets={user.frequentedSupermarkets} />
+      </motion.div>
+
+      {/* Sezione per i reparti popolari */}
+      <motion.div
+        className="mt-12"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.8 }}
+      >
+        <h2 className="text-2xl font-bold mb-6">Offerte per Reparto</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {popularAisles.map((aisle, index) => (
+            <motion.div
+              key={aisle}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+            >
+              <AisleOffers aisle={aisle} limit={4} />
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </div>
   )
