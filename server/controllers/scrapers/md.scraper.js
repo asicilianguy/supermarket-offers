@@ -6,6 +6,7 @@ import { chromium } from "playwright";
 import { processProductImages } from "../../services/aiService.js";
 import { delay, withRetry } from "../../utils/browserUtils.js";
 import { convertPdfToImages } from "../../utils/pdfUtils.js";
+import fetch from "node-fetch"; // Assicurati di avere questa dipendenza installata
 
 const mdScraper = async (req, res) => {
   let browser;
@@ -242,12 +243,12 @@ const mdScraper = async (req, res) => {
         // Se la conversione ha avuto successo, analizza le immagini
         if (imageFiles.length > 0) {
           console.log("Analisi delle immagini dei prodotti...");
-          const productsAnalysis = await processProductImages(imageFiles, "MD");
+          const productsAnalysis = await processProductImages(imageFiles, "md");
 
           // Estrai tutti i prodotti e appiattiscili in un unico array
           for (const pageResult of productsAnalysis) {
             if (Array.isArray(pageResult.productInfo)) {
-              // Se productInfo è già un array (diverso dal formato mostrato)
+              // Se productInfo è già un array
               allProductsInfo = [...allProductsInfo, ...pageResult.productInfo];
             } else if (
               typeof pageResult.productInfo === "object" &&
@@ -263,11 +264,47 @@ const mdScraper = async (req, res) => {
       3000
     );
 
-    // Rispondi con l'array completo di prodotti
-    res.json({
-      success: true,
-      productsInfo: allProductsInfo,
-    });
+    // Ora, invece di rispondere direttamente, facciamo una richiesta all'endpoint batch
+    if (allProductsInfo.length > 0) {
+      try {
+        const batchResponse = await fetch(
+          `${process.env.API_BASE_URL}/api/offers/batch`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ productsInfo: allProductsInfo }),
+          }
+        );
+
+        const batchResult = await batchResponse.json();
+
+        // Restituisci sia i prodotti che il risultato dell'operazione batch
+        res.json({
+          success: true,
+          productsInfo: allProductsInfo,
+          batchResult,
+        });
+      } catch (error) {
+        console.error(
+          "Errore nell'invio dei prodotti all'endpoint batch:",
+          error
+        );
+        // Se l'invio all'endpoint batch fallisce, restituisci comunque i prodotti
+        res.json({
+          success: true,
+          productsInfo: allProductsInfo,
+          batchError: error.message,
+        });
+      }
+    } else {
+      // Se non ci sono prodotti da inviare
+      res.json({
+        success: false,
+        message: "Nessun prodotto estratto dal volantino",
+      });
+    }
   } catch (error) {
     console.error("Errore nello scraping di MD:", error);
     res.status(500).json({
