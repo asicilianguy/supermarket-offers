@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Percent, TrendingDown } from "lucide-react"
+import { Card, CardBody, CardHeader } from "@heroui/react"
+import { Chip } from "@heroui/react"
+import { TrendingDown } from "lucide-react"
 import Link from "next/link"
 
 interface Offer {
@@ -24,33 +24,37 @@ interface BestOffersProps {
 export default function BestOffers({ offers, isLoading }: BestOffersProps) {
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="w-full">
+        <CardHeader className="flex gap-3">
+          <div className="flex items-center gap-2">
             <TrendingDown className="h-5 w-5" />
-            Migliori Offerte
-          </CardTitle>
+            <div className="flex flex-col">
+              <p className="text-md font-semibold">Migliori Offerte</p>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardBody>
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 bg-gray-200 rounded"></div>
             ))}
           </div>
-        </CardContent>
+        </CardBody>
       </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="w-full">
+      <CardHeader className="flex gap-3">
+        <div className="flex items-center gap-2">
           <TrendingDown className="h-5 w-5" />
-          Migliori Offerte
-        </CardTitle>
+          <div className="flex flex-col">
+            <p className="text-md font-semibold">Migliori Offerte</p>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardBody>
         {offers.length === 0 ? (
           <p className="text-gray-500">Nessuna offerta disponibile al momento</p>
         ) : (
@@ -66,25 +70,24 @@ export default function BestOffers({ offers, isLoading }: BestOffersProps) {
                   <p className="text-sm text-gray-500">{offer.chainName}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
+                  <p className="text-lg font-bold text-primary">€{offer.offerPrice.toFixed(2)}</p>
                   {offer.previousPrice && (
                     <p className="text-sm text-gray-500 line-through">€{offer.previousPrice.toFixed(2)}</p>
                   )}
                   {offer.discountPercentage && (
-                    <Badge className="mt-1" variant="destructive">
-                      <Percent className="h-3 w-3 mr-1" />
-                      {offer.discountPercentage}%
-                    </Badge>
+                    <Chip color="danger" size="sm" className="mt-1">
+                      -{offer.discountPercentage}%
+                    </Chip>
                   )}
                 </div>
               </div>
             ))}
           </div>
         )}
-        <Link href="/offers" className="block mt-4 text-center text-primary-600 hover:underline">
+        <Link href="/offers" className="block mt-4 text-center text-primary hover:underline">
           Vedi tutte le offerte
         </Link>
-      </CardContent>
+      </CardBody>
     </Card>
   )
 }
