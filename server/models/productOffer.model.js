@@ -1,87 +1,83 @@
 import mongoose from "mongoose"
+import { VALID_AISLES } from "../constants/aisles.js"
 
-const VALID_SUPERMARKETS = [
-  "esselunga",
-  "conad",
-  "lidl",
-  "eurospin",
-  "bennet",
-  "auchan",
-  "penny",
-  "despar",
-  "centesimo",
-  "carrefouriper",
-  "carrefourexpress",
-  "prestofresco",
-  "carrefourmarket",
-  "gigante",
-  "ins",
-  "todis",
-  "md",
-  "crai",
-  "paghipoco",
-]
-
-const productOfferSchema = new mongoose.Schema(
-  {
-    productName: {
+const productOfferSchema = new mongoose.Schema({
+  productName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  productDescription: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  originalPrice: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  discountedPrice: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  discountPercentage: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 100,
+  },
+  supermarketName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  supermarketLocation: {
+    type: {
       type: String,
-      required: true,
-      trim: true,
-    },
-    productQuantity: {
-      type: String,
-      trim: true,
-    },
-    offerPrice: {
-      type: Number,
+      enum: ["Point"],
       required: true,
     },
-    previousPrice: {
-      type: Number,
-    },
-    discountPercentage: {
-      type: Number,
-    },
-    pricePerKg: {
-      type: Number,
-    },
-    pricePerLiter: {
-      type: Number,
-    },
-    offerStartDate: {
-      type: Date,
+    coordinates: {
+      type: [Number],
       required: true,
-    },
-    offerEndDate: {
-      type: Date,
-      required: true,
-    },
-    brand: {
-      type: String,
-      trim: true,
-    },
-    supermarketAisle: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    chainName: {
-      type: String,
-      required: true,
-      enum: VALID_SUPERMARKETS,
     },
   },
-  { timestamps: true },
-)
+  supermarketAisle: {
+    type: [String], // Modificato da String a [String]
+    required: true,
+    validate: {
+      validator: (v) => {
+        // v sarà un array di stringhe
+        if (!Array.isArray(v) || v.length === 0) {
+          return false // Deve essere un array non vuoto
+        }
+        return v.every((aisle) => VALID_AISLES.includes(aisle))
+      },
+      message: (props) => `${props.value} contiene reparti non validi!`,
+    },
+    // trim non è applicabile direttamente a un array, ma a ciascun elemento.
+    // La validazione con includes si occuperà di questo.
+  },
+  offerExpiryDate: {
+    type: Date,
+    required: true,
+  },
+  offerPostedDate: {
+    type: Date,
+    default: Date.now,
+  },
+  // Add any other relevant fields here
+})
 
-// Create indexes for better performance
-productOfferSchema.index({ productName: "text", brand: "text" }) // Text search index
-productOfferSchema.index({ chainName: 1 }) // Query by supermarket
-productOfferSchema.index({ supermarketAisle: 1 }) // Query by aisle
-productOfferSchema.index({ offerEndDate: 1 }) // Query for active offers
-productOfferSchema.index({ offerPrice: 1 }) // Sort by price
-productOfferSchema.index({ discountPercentage: -1 }) // Sort by discount
+productOfferSchema.index({ supermarketLocation: "2dsphere" })
+productOfferSchema.index({ supermarketAisle: 1 }) // Query by aisle (rimane uguale, Mongoose gestisce gli array)
 
 const ProductOffer = mongoose.model("ProductOffer", productOfferSchema)
 
