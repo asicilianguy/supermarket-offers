@@ -1,39 +1,35 @@
 "use client"
 
-```tsx file="client/src/components/offers/OfferFilters.tsx"
-[v0-no-op-code-block-prefix]import React from 'react';
+import React from "react"
+import { VALID_AISLES } from "@/constants/aisles"
+import OfferFilters from "@/components/offers/OfferFilters"
 
 interface OfferFiltersProps {
   filters: {
-    supermarketAisle: string;
-  };
-  onFilterChange: (filterName: string, filterValue: string) => void;
-  aisles: string[]; // Assuming aisles is an array of strings
+    supermarketAisle: string
+  }
+  onFilterChange: (filterName: string, filterValue: string) => void
+  aisles: string[] // Assuming aisles is an array of strings
 }
 
-const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, aisles }) => {
-  return (
-    <div className="space-y-4">
-      <div>
-        <label htmlFor="supermarketAisle" className="block text-sm font-medium text-gray-700">
-          Reparto
-        </label>
-        <select
-          id="supermarketAisle"
-          value={filters.supermarketAisle}
-          onChange={(e) => onFilterChange("supermarketAisle", e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-        >
-          <option value="">Tutti i reparti</option>
-          {aisles.map((aisle) => (
-            <option key={aisle} value={aisle}>
-              {aisle}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-};
+const OffersPage: React.FC = () => {
+  const [filters, setFilters] = React.useState({
+    supermarketAisle: "",
+  })
 
-export default OfferFilters;
+  const handleFilterChange = (filterName: string, filterValue: string) => {
+    setFilters({
+      ...filters,
+      [filterName]: filterValue,
+    })
+  }
+
+  return (
+    <div className="container mx-auto p-4">
+      <OfferFilters filters={filters} onFilterChange={handleFilterChange} aisles={VALID_AISLES} />
+      {/* Other components and logic for displaying offers */}
+    </div>
+  )
+}
+
+export default OffersPage

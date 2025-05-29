@@ -1,48 +1,50 @@
-import ProductOffer from "../models/ProductOffer.js"
-import { VALID_AISLES } from "../constants/aisles.js"
+import ProductOffer from "../models/productOffer.model.js"
+import User from "../models/user.model.js"
+const { VALID_AISLES } = require("../constants/aisles.js")
 
-// @desc   Get all product offers
-// @route  GET /api/product-offers
-// @access Public
+// Get all offers
 export const getAllOffers = async (req, res) => {
   try {
-    const {
-      supermarket,
-      supermarketAisle,
-      productName,
-      offerPriceLessThan,
-      offerPriceGreaterThan,
-      sortBy,
-      page = 1,
-      limit = 10,
-    } = req.query
+    const { page = 1, limit = 20, chainName, supermarketAisle, brand, sort } = req.query
 
-    const query = { offerEndDate: { $gte: new Date() } }
+    const query = {}
 
-    if (supermarket) query.supermarket = supermarket
-    if (supermarketAisle) query.supermarketAisle = supermarketAisle
-    if (productName) query.productName = { $regex: productName, $options: "i" } // 'i' for case-insensitive search
-    if (offerPriceLessThan) query.offerPrice = { $lt: offerPriceLessThan }
-    if (offerPriceGreaterThan) query.offerPrice = { $gt: offerPriceGreaterThan }
+    // Apply filters if provided
+    if (chainName) query.chainName = chainName
+    if (supermarketAisle) {
+      // Se supermarketAisle è fornito, cerca offerte che contengono quel reparto
+      query.supermarketAisle = supermarketAisle
+    }
+    if (brand) query.brand = brand
 
-    const sortOptions = {}
-    if (sortBy) {
-      const [field, order] = sortBy.split(":")
-      sortOptions[field] = order === "desc" ? -1 : 1
+    // Only show active offers
+    query.offerEndDate = { $gte: new Date() }
+
+    // Determine sort order
+    let sortOption = {}
+    if (sort === "price") {
+      sortOption = { offerPrice: 1 }
+    } else if (sort === "discount") {
+      sortOption = { discountPercentage: -1 }
+    } else if (sort === "endDate") {
+      sortOption = { offerEndDate: 1 }
+    } else {
+      // Default sort by newest
+      sortOption = { createdAt: -1 }
     }
 
-    const skip = (page - 1) * limit
+    const offers = await ProductOffer.find(query)
+      .sort(sortOption)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
 
-    const offers = await ProductOffer.find(query).sort(sortOptions).skip(skip).limit(limit)
-
-    const totalOffers = await ProductOffer.countDocuments(query)
+    const count = await ProductOffer.countDocuments(query)
 
     res.json({
-      data: offers,
-      total: totalOffers,
-      page: Number.parseInt(page),
-      limit: Number.parseInt(limit),
-      totalPages: Math.ceil(totalOffers / limit),
+      offers,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
     })
   } catch (err) {
     console.error("Error in getAllOffers:", err.message)
@@ -50,28 +52,208 @@ export const getAllOffers = async (req, res) => {
   }
 }
 
-// @desc   Get product offers by aisle
-// @route  GET /api/product-offers/aisle/:aisle
-// @access Public
+// Get offers by supermarket
+export const getOffersBySupermarket = async (req, res) => {
+  try {
+    const { chainName } = req.params
+    const { page = 1, limit = 20, sort } = req.query
+
+    // Determine sort order
+    let sortOption = {}
+    if (sort === "price") {
+      sortOption = { offerPrice: 1 }
+    } else if (sort === "discount") {
+      sortOption = { discountPercentage: -1 }
+    } else {
+      // Default sort by newest
+      sortOption = { createdAt: -1 }
+    }
+
+    const offers = await ProductOffer.find({
+      chainName,
+      offerEndDate: { $gte: new Date() },
+    })
+      .sort(sortOption)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
+
+    const count = await ProductOffer.countDocuments({
+      chainName,
+      offerEndDate: { $gte: new Date() },
+    })
+
+    res.json({
+      offers,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    })
+  } catch (err) {
+    console.error("Error in getOffersBySupermarket:", err.message)
+    res.status(500).send("Server error")
+  }
+}
+
+// Get offers by product name (search)
+export const searchOffers = async (req, res) => {
+  try {
+    const { query } = req.params
+    const { page = 1, limit = 20 } = req.query
+
+    const offers = await ProductOffer.find({
+      $text: { $search: query },
+      offerEndDate: { $gte: new Date() },
+    })
+      .sort({ score: { $meta: "textScore" } })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
+
+    const count = await ProductOffer.countDocuments({
+      $text: { $search: query },
+      offerEndDate: { $gte: new Date() },
+    })
+
+    res.json({
+      offers,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    })
+  } catch (err) {
+    console.error("Error in searchOffers:", err.message)
+    res.status(500).send("Server error")
+  }
+}
+
+// Get offers for user's shopping list
+export const getOffersForShoppingList = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Get user's shopping list and frequented supermarkets
+    const { shoppingList, frequentedSupermarkets } = user
+
+    if (shoppingList.length === 0) {
+      return res.json({ message: "Shopping list is empty", offers: [] })
+    }
+
+    // Create an array of product names from the shopping list
+    const productNames = shoppingList.map((item) => item.productName)
+
+    // Find offers that match products in the shopping list and are from frequented supermarkets
+    const offers = await Promise.all(
+      productNames.map(async (productName) => {
+        const matchingOffers = await ProductOffer.find({
+          $text: { $search: productName },
+          chainName: { $in: frequentedSupermarkets },
+          offerEndDate: { $gte: new Date() },
+        })
+          .sort({ offerPrice: 1 })
+          .limit(5)
+
+        return {
+          productName,
+          offers: matchingOffers,
+        }
+      }),
+    )
+
+    res.json(offers)
+  } catch (err) {
+    console.error("Error in getOffersForShoppingList:", err.message)
+    res.status(500).send("Server error")
+  }
+}
+
+// Get best offers (highest discount percentage)
+export const getBestOffers = async (req, res) => {
+  try {
+    const { limit = 20 } = req.query
+
+    const offers = await ProductOffer.find({
+      offerEndDate: { $gte: new Date() },
+      discountPercentage: { $exists: true, $ne: null },
+    })
+      .sort({ discountPercentage: -1 })
+      .limit(limit * 1)
+      .exec()
+
+    res.json(offers)
+  } catch (err) {
+    console.error("Error in getBestOffers:", err.message)
+    res.status(500).send("Server error")
+  }
+}
+
+// Get offers by aisle
 export const getOffersByAisle = async (req, res) => {
   try {
     const { aisle } = req.params
+    const { page = 1, limit = 20, chainName } = req.query
+
     const query = {
-      supermarketAisle: aisle, // Questo cercherà 'aisle' all'interno dell'array supermarketAisle nel DB
+      supermarketAisle: aisle, // Mongoose cerca automaticamente nell'array
       offerEndDate: { $gte: new Date() },
     }
 
+    if (chainName) {
+      query.chainName = chainName
+    }
+
     const offers = await ProductOffer.find(query)
-    res.json(offers)
+      .sort({ offerPrice: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
+
+    const count = await ProductOffer.countDocuments(query)
+
+    res.json({
+      offers,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    })
   } catch (err) {
     console.error("Error in getOffersByAisle:", err.message)
     res.status(500).send("Server error")
   }
 }
 
-// @desc   Get all distinct aisles
-// @route  GET /api/product-offers/aisles
-// @access Public
+// Get offers by brand
+export const getOffersByBrand = async (req, res) => {
+  try {
+    const { brand } = req.params
+    const { page = 1, limit = 20 } = req.query
+
+    const offers = await ProductOffer.find({
+      brand,
+      offerEndDate: { $gte: new Date() },
+    })
+      .sort({ offerPrice: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec()
+
+    const count = await ProductOffer.countDocuments({
+      brand,
+      offerEndDate: { $gte: new Date() },
+    })
+
+    res.json({
+      offers,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    })
+  } catch (err) {
+    console.error("Error in getOffersByBrand:", err.message)
+    res.status(500).send("Server error")
+  }
+}
+
+// Get all available aisles - ora restituisce l'array predefinito
 export const getAllAisles = async (req, res) => {
   try {
     res.json(VALID_AISLES)
@@ -81,48 +263,13 @@ export const getAllAisles = async (req, res) => {
   }
 }
 
-// @desc   Create a new product offer
-// @route  POST /api/product-offers
-// @access Public
-export const createOffer = async (req, res) => {
+// Get all available brands
+export const getAllBrands = async (req, res) => {
   try {
-    const newOffer = new ProductOffer(req.body)
-    const savedOffer = await newOffer.save()
-    res.status(201).json(savedOffer)
+    const brands = await ProductOffer.distinct("brand")
+    res.json(brands.filter((brand) => brand)) // Filter out null or empty brands
   } catch (err) {
-    console.error("Error in createOffer:", err.message)
-    res.status(500).send("Server error")
-  }
-}
-
-// @desc   Update a product offer
-// @route  PUT /api/product-offers/:id
-// @access Public
-export const updateOffer = async (req, res) => {
-  try {
-    const updatedOffer = await ProductOffer.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    if (!updatedOffer) {
-      return res.status(404).send("Offer not found")
-    }
-    res.json(updatedOffer)
-  } catch (err) {
-    console.error("Error in updateOffer:", err.message)
-    res.status(500).send("Server error")
-  }
-}
-
-// @desc   Delete a product offer
-// @route  DELETE /api/product-offers/:id
-// @access Public
-export const deleteOffer = async (req, res) => {
-  try {
-    const deletedOffer = await ProductOffer.findByIdAndDelete(req.params.id)
-    if (!deletedOffer) {
-      return res.status(404).send("Offer not found")
-    }
-    res.status(204).send() // 204 No Content
-  } catch (err) {
-    console.error("Error in deleteOffer:", err.message)
+    console.error("Error in getAllBrands:", err.message)
     res.status(500).send("Server error")
   }
 }

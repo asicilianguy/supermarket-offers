@@ -1,14 +1,16 @@
-import React from 'react';
+"use client"
+
+import type React from "react"
+import { VALID_AISLES } from "@/constants/aisles"
 
 interface OfferFiltersProps {
   filters: {
-    supermarketAisle: string;
-  };
-  onFilterChange: (filterName: string, filterValue: string) => void;
-  aisles: string[]; // Assuming aisles is an array of strings
+    supermarketAisle: string
+  }
+  onFilterChange: (filterName: string, filterValue: string) => void
 }
 
-const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, aisles }) => {
+const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange }) => {
   return (
     <div className="space-y-4">
       <div>
@@ -22,7 +24,7 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
         >
           <option value="">Tutti i reparti</option>
-          {aisles.map((aisle) => (
+          {VALID_AISLES.map((aisle) => (
             <option key={aisle} value={aisle}>
               {aisle}
             </option>
@@ -30,7 +32,7 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
         </select>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OfferFilters;
+export default OfferFilters

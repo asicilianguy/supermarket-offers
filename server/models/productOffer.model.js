@@ -1,83 +1,98 @@
 import mongoose from "mongoose"
-import { VALID_AISLES } from "../constants/aisles.js"
+const { VALID_AISLES } = require("../constants/aisles.js")
 
-const productOfferSchema = new mongoose.Schema({
-  productName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  productDescription: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  imageUrl: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  originalPrice: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  discountedPrice: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  discountPercentage: {
-    type: Number,
-    required: true,
-    min: 0,
-    max: 100,
-  },
-  supermarketName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  supermarketLocation: {
-    type: {
+const VALID_SUPERMARKETS = [
+  "esselunga",
+  "conad",
+  "lidl",
+  "eurospin",
+  "bennet",
+  "auchan",
+  "penny",
+  "despar",
+  "centesimo",
+  "carrefouriper",
+  "carrefourexpress",
+  "prestofresco",
+  "carrefourmarket",
+  "gigante",
+  "ins",
+  "todis",
+  "md",
+  "crai",
+  "paghipoco",
+]
+
+const productOfferSchema = new mongoose.Schema(
+  {
+    productName: {
       type: String,
-      enum: ["Point"],
+      required: true,
+      trim: true,
+    },
+    productQuantity: {
+      type: String,
+      trim: true,
+    },
+    offerPrice: {
+      type: Number,
       required: true,
     },
-    coordinates: {
-      type: [Number],
+    previousPrice: {
+      type: Number,
+    },
+    discountPercentage: {
+      type: Number,
+    },
+    pricePerKg: {
+      type: Number,
+    },
+    pricePerLiter: {
+      type: Number,
+    },
+    offerStartDate: {
+      type: Date,
       required: true,
     },
-  },
-  supermarketAisle: {
-    type: [String], // Modificato da String a [String]
-    required: true,
-    validate: {
-      validator: (v) => {
-        // v sarà un array di stringhe
-        if (!Array.isArray(v) || v.length === 0) {
-          return false // Deve essere un array non vuoto
-        }
-        return v.every((aisle) => VALID_AISLES.includes(aisle))
+    offerEndDate: {
+      type: Date,
+      required: true,
+    },
+    brand: {
+      type: String,
+      trim: true,
+    },
+    supermarketAisle: {
+      type: [String], // Cambiato da String a [String]
+      required: true,
+      validate: {
+        validator: (aisles) => {
+          // Verifica che sia un array non vuoto
+          if (!Array.isArray(aisles) || aisles.length === 0) {
+            return false
+          }
+          // Verifica che ogni elemento sia un reparto valido
+          return aisles.every((aisle) => VALID_AISLES.includes(aisle))
+        },
+        message: "I reparti devono essere validi e almeno uno deve essere specificato",
       },
-      message: (props) => `${props.value} contiene reparti non validi!`,
     },
-    // trim non è applicabile direttamente a un array, ma a ciascun elemento.
-    // La validazione con includes si occuperà di questo.
+    chainName: {
+      type: String,
+      required: true,
+      enum: VALID_SUPERMARKETS,
+    },
   },
-  offerExpiryDate: {
-    type: Date,
-    required: true,
-  },
-  offerPostedDate: {
-    type: Date,
-    default: Date.now,
-  },
-  // Add any other relevant fields here
-})
+  { timestamps: true },
+)
 
-productOfferSchema.index({ supermarketLocation: "2dsphere" })
-productOfferSchema.index({ supermarketAisle: 1 }) // Query by aisle (rimane uguale, Mongoose gestisce gli array)
+// Create indexes for better performance
+productOfferSchema.index({ productName: "text", brand: "text" }) // Text search index
+productOfferSchema.index({ chainName: 1 }) // Query by supermarket
+productOfferSchema.index({ supermarketAisle: 1 }) // Query by aisle (funziona anche con array)
+productOfferSchema.index({ offerEndDate: 1 }) // Query for active offers
+productOfferSchema.index({ offerPrice: 1 }) // Sort by price
+productOfferSchema.index({ discountPercentage: -1 }) // Sort by discount
 
 const ProductOffer = mongoose.model("ProductOffer", productOfferSchema)
 
