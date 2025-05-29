@@ -1,21 +1,24 @@
-"use client"
-import { motion } from "framer-motion"
-import { Check, ShoppingCart } from "lucide-react"
-import { SUPERMARKETS } from "@/constants/supermarkets"
+"use client";
+import { motion } from "framer-motion";
+import { Check, ShoppingCart } from "lucide-react";
+import { SUPERMARKETS } from "@/constants/supermarkets";
 
 interface SupermarketSelectorProps {
-  selectedSupermarkets: string[]
-  onChange: (supermarkets: string[]) => void
+  selectedSupermarkets: string[];
+  onChange: (supermarkets: string[]) => void;
 }
 
-export default function SupermarketSelector({ selectedSupermarkets, onChange }: SupermarketSelectorProps) {
+export default function SupermarketSelector({
+  selectedSupermarkets,
+  onChange,
+}: SupermarketSelectorProps) {
   const toggleSupermarket = (supermarket: string) => {
     if (selectedSupermarkets.includes(supermarket)) {
-      onChange(selectedSupermarkets.filter((s) => s !== supermarket))
+      onChange(selectedSupermarkets.filter((s) => s !== supermarket));
     } else {
-      onChange([...selectedSupermarkets, supermarket])
+      onChange([...selectedSupermarkets, supermarket]);
     }
-  }
+  };
 
   // Function to get a color based on the supermarket name
   const getSupermarketColor = (name: string) => {
@@ -26,29 +29,35 @@ export default function SupermarketSelector({ selectedSupermarkets, onChange }: 
       "from-primary-600 to-secondary-500",
       "from-secondary-600 to-accent-500",
       "from-accent-600 to-primary-500",
-    ]
+    ];
 
     // Use the first character of the supermarket name to determine the color
-    const index = name.charCodeAt(0) % colors.length
-    return colors[index]
-  }
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      {SUPERMARKETS.map((supermarket) => {
-        const isSelected = selectedSupermarkets.includes(supermarket)
+      {SUPERMARKETS.map(({ value, label }) => {
+        const isSelected = selectedSupermarkets.includes(label);
         return (
           <motion.div
-            key={supermarket}
+            key={label}
             className={`relative overflow-hidden rounded-xl shadow-md cursor-pointer transition-all duration-300 ${
-              isSelected ? "ring-2 ring-primary-500 ring-offset-2" : "ring-1 ring-gray-200"
+              isSelected
+                ? "ring-2 ring-primary-500 ring-offset-2"
+                : "ring-1 ring-gray-200"
             }`}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => toggleSupermarket(supermarket)}
+            onClick={() => toggleSupermarket(label)}
             layout
           >
-            <div className={`h-full bg-gradient-to-br ${getSupermarketColor(supermarket)} p-4 text-white`}>
+            <div
+              className={`h-full bg-gradient-to-br ${getSupermarketColor(
+                label
+              )} p-4 text-white`}
+            >
               <div className="flex items-center justify-between">
                 <ShoppingCart className="h-5 w-5" />
                 {isSelected && (
@@ -61,11 +70,11 @@ export default function SupermarketSelector({ selectedSupermarkets, onChange }: 
                   </motion.div>
                 )}
               </div>
-              <p className="mt-2 font-medium">{supermarket}</p>
+              <p className="mt-2 font-medium">{label}</p>
             </div>
           </motion.div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

@@ -78,7 +78,6 @@ async function analyzeProductImage(base64Image, storeName = null) {
       "abbigliamento",
       "elettrodomestici",
       "frutta secca",
-      "fai da te",
       "bricolage",
     ];
 

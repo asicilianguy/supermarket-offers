@@ -1,4 +1,4 @@
-export const SUPERMARKET_CHAINS = [
+export const SUPERMARKETS = [
   { value: "auchan", label: "Auchan" },
   { value: "bennet", label: "Bennet" },
   { value: "carrefour-express", label: "Carrefour Express" },
@@ -20,4 +20,4 @@ export const SUPERMARKET_CHAINS = [
   { value: "todis", label: "Todis" },
 ] as const
 
-export type SupermarketChain = (typeof SUPERMARKET_CHAINS)[number]["value"]
+export type SupermarketChain = (typeof SUPERMARKETS)[number]["value"]

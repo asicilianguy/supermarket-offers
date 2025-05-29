@@ -46,7 +46,7 @@ export default function Register() {
   const handleSelectAll = () => {
     setFormData({
       ...formData,
-      frequentedSupermarkets: [...SUPERMARKETS],
+      frequentedSupermarkets: SUPERMARKETS.map(supermarket => supermarket.value),
     })
     showToast.info("Tutti i supermercati selezionati")
   }

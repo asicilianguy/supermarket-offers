@@ -60,7 +60,6 @@ export const VALID_AISLES = [
   "abbigliamento",
   "elettrodomestici",
   "frutta secca",
-  "fai da te",
   "bricolage",
 ] as const; // 'as const' per inferire tipi stringa letterali più stretti
 

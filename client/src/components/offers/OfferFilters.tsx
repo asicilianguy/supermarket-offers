@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
-import { SUPERMARKET_CHAINS } from "@/constants/supermarkets"
+import { SUPERMARKETS } from "@/constants/supermarkets"
 
 interface OfferFiltersProps {
   filters: {
@@ -67,7 +67,7 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="allChains">Tutti i supermercati</SelectItem>
-              {SUPERMARKET_CHAINS.map((chain) => (
+              {SUPERMARKETS.map((chain) => (
                 <SelectItem key={chain.value} value={chain.value}>
                   {chain.label}
                 </SelectItem>

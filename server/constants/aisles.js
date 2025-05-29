@@ -40,7 +40,6 @@ export const VALID_AISLES = [
   "cura per la casa",
   "cura per la persona",
   "animali domestici",
-  "fai da te",
   "giardinaggio",
   "cura dell’auto",
   "prodotti per anziani",
