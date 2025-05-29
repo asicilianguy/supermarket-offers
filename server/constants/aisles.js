@@ -60,4 +60,7 @@ export const VALID_AISLES = [
   "abbigliamento",
   "elettrodomestici",
   "frutta secca",
+
+  "fai da te",
+  "bricolage",
 ];

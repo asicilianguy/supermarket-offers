@@ -60,6 +60,8 @@ export const VALID_AISLES = [
   "abbigliamento",
   "elettrodomestici",
   "frutta secca",
-] as const // 'as const' per inferire tipi stringa letterali più stretti
+  "fai da te",
+  "bricolage",
+] as const; // 'as const' per inferire tipi stringa letterali più stretti
 
-export type Aisle = (typeof VALID_AISLES)[number]
+export type Aisle = (typeof VALID_AISLES)[number];

@@ -78,6 +78,8 @@ async function analyzeProductImage(base64Image, storeName = null) {
       "abbigliamento",
       "elettrodomestici",
       "frutta secca",
+      "fai da te",
+      "bricolage",
     ];
 
     // Crea un prompt personalizzato che include le informazioni sul supermercato
