@@ -15,6 +15,71 @@ async function analyzeProductImage(base64Image, storeName = null) {
   try {
     console.log("Invio dell'immagine a OpenAI per l'analisi...");
 
+    // Array di categorie disponibili
+    const aisleCategories = [
+      "frutta e verdura",
+      "carne",
+      "pesce",
+      "salumi",
+      "formaggi",
+      "pane e prodotti da forno",
+      "pasta",
+      "riso",
+      "legumi",
+      "olio e condimenti",
+      "uova",
+      "latticini",
+      "bevande",
+      "vino",
+      "birra",
+      "acqua",
+      "caffè",
+      "zucchero e dolcificanti",
+      "biscotti",
+      "merendine",
+      "cioccolato",
+      "snack salati",
+      "gelati",
+      "surgelati",
+      "conserve",
+      "sughi e salse",
+      "prodotti per la colazione",
+      "bio",
+      "senza glutine",
+      "senza lattosio",
+      "vegano",
+      "vegetariano",
+      "low carb",
+      "proteico",
+      "km 0",
+      "artigianale",
+      "prodotti locali",
+      "per bambini",
+      "cura per la casa",
+      "cura per la persona",
+      "animali domestici",
+      "fai da te",
+      "giardinaggio",
+      "cura dell'auto",
+      "prodotti per anziani",
+      "estate",
+      "autunno",
+      "inverno",
+      "primavera",
+      "cambio stagione",
+      "viaggi",
+      "spesa base",
+      "cene speciali",
+      "compleanni",
+      "feste bambini",
+      "weekend",
+      "fitness",
+      "pronto subito",
+      "abbigliamento",
+      "elettrodomestici",
+      "frutta secca",
+    ];
+
     // Crea un prompt personalizzato che include le informazioni sul supermercato
     let promptText =
       "Analizza questa immagine di un volantino promozionale e ritorna le seguenti informazioni in formato JSON:";
@@ -37,8 +102,11 @@ async function analyzeProductImage(base64Image, storeName = null) {
     promptText += "\n- offerEndDate (in formato dd-mm-yyyy)";
 
     promptText += "\n- brand (se presente)";
+
+    // Modifica la richiesta per supermarketAisle
     promptText +=
-      "\n- supermarketAisle (basata su una stima intelligente di dove potrebbe essere posizionato questo prodotto)";
+      "\n- supermarketAisle (OBBLIGATORIO: seleziona tutte le categorie appropriate per il prodotto dall'elenco seguente, restituiscile come array di stringhe):";
+    promptText += "\n" + JSON.stringify(aisleCategories);
 
     // Aggiungi informazioni sul supermercato se disponibili
     if (storeName) {
@@ -94,6 +162,26 @@ async function analyzeProductImage(base64Image, storeName = null) {
       if (parsedJson.offerEndDate) {
         const [day, month, year] = parsedJson.offerEndDate.split("-");
         parsedJson.offerEndDate = new Date(`${year}-${month}-${day}`);
+      }
+
+      // Verifica che supermarketAisle sia un array e contenga valori validi
+      if (
+        !parsedJson.supermarketAisle ||
+        !Array.isArray(parsedJson.supermarketAisle) ||
+        parsedJson.supermarketAisle.length === 0
+      ) {
+        // Se non è un array o è vuoto, assegna almeno una categoria in base al nome del prodotto
+        parsedJson.supermarketAisle = ["spesa base"];
+      } else {
+        // Verifica che tutti i valori siano presenti nell'elenco delle categorie
+        parsedJson.supermarketAisle = parsedJson.supermarketAisle.filter(
+          (category) => aisleCategories.includes(category.toLowerCase())
+        );
+
+        // Se dopo il filtro non rimangono categorie, assegna una categoria di default
+        if (parsedJson.supermarketAisle.length === 0) {
+          parsedJson.supermarketAisle = ["spesa base"];
+        }
       }
 
       return parsedJson;

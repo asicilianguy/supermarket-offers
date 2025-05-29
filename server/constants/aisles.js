@@ -1,4 +1,4 @@
-const VALID_AISLES = [
+export const VALID_AISLES = [
   "frutta e verdura",
   "carne",
   "pesce",
@@ -60,6 +60,4 @@ const VALID_AISLES = [
   "abbigliamento",
   "elettrodomestici",
   "frutta secca",
-]
-
-module.exports = { VALID_AISLES }
+];

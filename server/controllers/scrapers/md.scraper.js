@@ -1,15 +1,20 @@
 // Controller per lo scraping di MD
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { chromium } from "playwright";
-import { DOWNLOAD_DIR } from "../../config/config.js";
 import { processProductImages } from "../../services/aiService.js";
 import { delay, withRetry } from "../../utils/browserUtils.js";
 import { convertPdfToImages } from "../../utils/pdfUtils.js";
 
 const mdScraper = async (req, res) => {
   let browser;
+  let tempDir = null;
+
   try {
+    // Crea una directory temporanea invece di usare DOWNLOAD_DIR
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "md-scraper-"));
+
     // Avvia il browser
     browser = await chromium.launch({
       headless: true,
@@ -209,9 +214,9 @@ const mdScraper = async (req, res) => {
       throw new Error("Non è stato possibile trovare il link al volantino PDF");
     }
 
-    const results = [];
+    let allProductsInfo = [];
 
-    // Download del PDF
+    // Download del PDF e analisi dei prodotti
     await withRetry(
       async () => {
         console.log("Tentativo di download del PDF da:", pdfUrl);
@@ -223,53 +228,45 @@ const mdScraper = async (req, res) => {
 
         const buffer = await pdfResponse.arrayBuffer();
 
-        const fileName = `md_volantino_${Date.now()}.pdf`;
-        const filePath = path.join(DOWNLOAD_DIR, fileName);
+        // Salva temporaneamente il PDF nella directory temporanea
+        const tempFileName = `md_volantino_${Date.now()}.pdf`;
+        const tempFilePath = path.join(tempDir, tempFileName);
 
-        fs.writeFileSync(filePath, Buffer.from(buffer));
-        console.log("PDF scaricato con successo:", filePath);
+        fs.writeFileSync(tempFilePath, Buffer.from(buffer));
+        console.log("PDF scaricato temporaneamente:", tempFilePath);
 
-        // Converti il PDF in immagini
+        // Converti il PDF in immagini (sempre nella directory temporanea)
         console.log("Conversione del PDF in immagini...");
-        const imageFiles = await convertPdfToImages(filePath, DOWNLOAD_DIR);
+        const imageFiles = await convertPdfToImages(tempFilePath, tempDir);
 
-        // Se la conversione ha avuto successo, aggiungi i percorsi delle immagini
+        // Se la conversione ha avuto successo, analizza le immagini
         if (imageFiles.length > 0) {
-          // Analizza le immagini e ottieni informazioni sui prodotti
           console.log("Analisi delle immagini dei prodotti...");
-
           const productsAnalysis = await processProductImages(imageFiles, "MD");
 
-          results.push({
-            storeName: "MD", // Aggiunto campo richiesto dal frontend
-            address: "Italia", // Aggiunto campo richiesto dal frontend
-            flyerUrl:
-              "https://www.mdspa.it/punti-vendita/Sicilia/AG-Agrigento/516-FAVARA/",
-            pdfPath: `/downloads/${fileName}`,
-            imagesPaths: imageFiles.map(
-              (imgPath) => `/downloads/${path.basename(imgPath)}`
-            ),
-            productsInfo: productsAnalysis,
-          });
-        } else {
-          // Fallback al PDF se la conversione fallisce
-          results.push({
-            storeName: "MD", // Aggiunto campo richiesto dal frontend
-            address: "Italia", // Aggiunto campo richiesto dal frontend
-            flyerUrl:
-              "https://www.mdspa.it/punti-vendita/Sicilia/AG-Agrigento/516-FAVARA/",
-            pdfPath: `/downloads/${fileName}`,
-          });
+          // Estrai tutti i prodotti e appiattiscili in un unico array
+          for (const pageResult of productsAnalysis) {
+            if (Array.isArray(pageResult.productInfo)) {
+              // Se productInfo è già un array (diverso dal formato mostrato)
+              allProductsInfo = [...allProductsInfo, ...pageResult.productInfo];
+            } else if (
+              typeof pageResult.productInfo === "object" &&
+              pageResult.productInfo !== null
+            ) {
+              // Se è un singolo oggetto prodotto
+              allProductsInfo.push(pageResult.productInfo);
+            }
+          }
         }
       },
       3,
       3000
     );
 
+    // Rispondi con l'array completo di prodotti
     res.json({
       success: true,
-      message: `Volantino scaricato con successo`,
-      flyers: results,
+      productsInfo: allProductsInfo,
     });
   } catch (error) {
     console.error("Errore nello scraping di MD:", error);
@@ -278,8 +275,25 @@ const mdScraper = async (req, res) => {
       error: error instanceof Error ? error.message : "Errore sconosciuto",
     });
   } finally {
+    // Chiudi il browser
     if (browser) {
       await browser.close();
+    }
+
+    // Pulisci i file temporanei
+    if (tempDir && fs.existsSync(tempDir)) {
+      try {
+        // Elimina tutti i file nella directory temporanea
+        const files = fs.readdirSync(tempDir);
+        for (const file of files) {
+          fs.unlinkSync(path.join(tempDir, file));
+        }
+        // Elimina la directory temporanea
+        fs.rmdirSync(tempDir);
+        console.log("Directory temporanea eliminata:", tempDir);
+      } catch (error) {
+        console.error("Errore durante la pulizia dei file temporanei:", error);
+      }
     }
   }
 };

@@ -1,6 +1,5 @@
-import mongoose from "mongoose"
-const { VALID_AISLES } = require("../constants/aisles.js")
-
+import mongoose from "mongoose";
+import { VALID_AISLES } from "../constants/aisles.js";
 const VALID_SUPERMARKETS = [
   "esselunga",
   "conad",
@@ -21,7 +20,7 @@ const VALID_SUPERMARKETS = [
   "md",
   "crai",
   "paghipoco",
-]
+];
 
 const productOfferSchema = new mongoose.Schema(
   {
@@ -69,12 +68,13 @@ const productOfferSchema = new mongoose.Schema(
         validator: (aisles) => {
           // Verifica che sia un array non vuoto
           if (!Array.isArray(aisles) || aisles.length === 0) {
-            return false
+            return false;
           }
           // Verifica che ogni elemento sia un reparto valido
-          return aisles.every((aisle) => VALID_AISLES.includes(aisle))
+          return aisles.every((aisle) => VALID_AISLES.includes(aisle));
         },
-        message: "I reparti devono essere validi e almeno uno deve essere specificato",
+        message:
+          "I reparti devono essere validi e almeno uno deve essere specificato",
       },
     },
     chainName: {
@@ -83,17 +83,17 @@ const productOfferSchema = new mongoose.Schema(
       enum: VALID_SUPERMARKETS,
     },
   },
-  { timestamps: true },
-)
+  { timestamps: true }
+);
 
 // Create indexes for better performance
-productOfferSchema.index({ productName: "text", brand: "text" }) // Text search index
-productOfferSchema.index({ chainName: 1 }) // Query by supermarket
-productOfferSchema.index({ supermarketAisle: 1 }) // Query by aisle (funziona anche con array)
-productOfferSchema.index({ offerEndDate: 1 }) // Query for active offers
-productOfferSchema.index({ offerPrice: 1 }) // Sort by price
-productOfferSchema.index({ discountPercentage: -1 }) // Sort by discount
+productOfferSchema.index({ productName: "text", brand: "text" }); // Text search index
+productOfferSchema.index({ chainName: 1 }); // Query by supermarket
+productOfferSchema.index({ supermarketAisle: 1 }); // Query by aisle (funziona anche con array)
+productOfferSchema.index({ offerEndDate: 1 }); // Query for active offers
+productOfferSchema.index({ offerPrice: 1 }); // Sort by price
+productOfferSchema.index({ discountPercentage: -1 }); // Sort by discount
 
-const ProductOffer = mongoose.model("ProductOffer", productOfferSchema)
+const ProductOffer = mongoose.model("ProductOffer", productOfferSchema);
 
-export default ProductOffer
+export default ProductOffer;
