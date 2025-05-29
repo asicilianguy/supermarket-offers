@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
-import { SUPERMARKET_CHAINS } from "@/constants/supermarkets" // Importa le catene di supermercati
+import { SUPERMARKET_CHAINS } from "@/constants/supermarkets"
 
 interface OfferFiltersProps {
   filters: {
@@ -16,7 +16,6 @@ interface OfferFiltersProps {
   }
   onFilterChange: (filterName: string, filterValue: string) => void
   aisles: string[]
-  // Aggiungi qui altre props se necessario, es. allBrands, allChains
 }
 
 const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, aisles }) => {
@@ -26,6 +25,16 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
     onFilterChange("brand", "")
   }
 
+  const handleAisleChange = (value: string) => {
+    const actualValue = value === "allAisles" ? "" : value
+    onFilterChange("supermarketAisle", actualValue)
+  }
+
+  const handleChainChange = (value: string) => {
+    const actualValue = value === "allChains" ? "" : value
+    onFilterChange("chainName", actualValue)
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -33,11 +42,8 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
           <Label htmlFor="supermarketAisle" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Reparto
           </Label>
-          <Select
-            value={filters.supermarketAisle || "allAisles"}
-            onValueChange={(value) => onFilterChange("supermarketAisle", value)}
-          >
-            <SelectTrigger id="supermarketAisle" className="w-full mt-1">
+          <Select value={filters.supermarketAisle || "allAisles"} onValueChange={handleAisleChange}>
+            <SelectTrigger className="w-full mt-1">
               <SelectValue placeholder="Tutti i reparti" />
             </SelectTrigger>
             <SelectContent>
@@ -55,11 +61,8 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
           <Label htmlFor="chainName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Supermercato
           </Label>
-          <Select
-            value={filters.chainName || "allChains"}
-            onValueChange={(value) => onFilterChange("chainName", value)}
-          >
-            <SelectTrigger id="chainName" className="w-full mt-1">
+          <Select value={filters.chainName || "allChains"} onValueChange={handleChainChange}>
+            <SelectTrigger className="w-full mt-1">
               <SelectValue placeholder="Tutti i supermercati" />
             </SelectTrigger>
             <SelectContent>
@@ -85,7 +88,6 @@ const OfferFilters: React.FC<OfferFiltersProps> = ({ filters, onFilterChange, ai
             onChange={(e) => onFilterChange("brand", e.target.value)}
             className="w-full mt-1"
           />
-          {/* Potresti sostituire questo con un Select popolato da useGetAllBrandsQuery se preferisci */}
         </div>
 
         <div className="flex items-end">
