@@ -1,10 +1,7 @@
 "use client"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useGetOffersByAisleQuery } from "@/redux/features/productOffer/productOfferApiSlice"
-import { ShoppingCart } from "lucide-react"
-import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface AisleOffersProps {
@@ -21,64 +18,42 @@ export default function AisleOffers({ aisle, limit = 4 }: AisleOffersProps) {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="h-4 w-4" />
-            <h4 className="text-md font-semibold capitalize">{aisle}</h4>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        {[...Array(limit)].map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full rounded-md" />
+        ))}
+      </div>
     )
   }
 
   const offers = data?.offers || []
 
+  if (offers.length === 0) {
+    return <p className="text-sm text-gray-500">Nessuna offerta disponibile per {aisle}.</p>
+  }
+
   return (
-    <Card hover>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="h-4 w-4 text-primary-600" />
-          <h4 className="text-md font-semibold capitalize">{aisle}</h4>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {offers.length === 0 ? (
-          <p className="text-sm text-gray-500">Nessuna offerta disponibile</p>
-        ) : (
-          <div className="space-y-2">
-            {offers.slice(0, limit).map((offer) => (
-              <div key={offer._id} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div className="flex-1 pr-2">
-                  <p className="text-sm font-medium line-clamp-1">{offer.productName}</p>
-                  <p className="text-xs text-gray-500">{offer.chainName}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
-                  {offer.discountPercentage && (
-                    <Badge variant="danger" size="sm">
-                      -{offer.discountPercentage}%
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        <Link
-          href={`/offers?aisle=${encodeURIComponent(aisle)}`}
-          className="block mt-3 text-xs text-center text-primary-600 hover:underline"
+    <div className="space-y-3">
+      {offers.slice(0, limit).map((offer) => (
+        <div
+          key={offer._id}
+          className="flex items-center justify-between py-2 px-3 border rounded-lg hover:bg-gray-50 transition-colors"
         >
-          Vedi tutte le offerte di {aisle}
-        </Link>
-      </CardContent>
-    </Card>
+          <div className="flex-1 pr-2">
+            <p className="text-sm font-medium line-clamp-1 text-gray-800">{offer.productName}</p>
+            <p className="text-xs text-gray-500">{offer.chainName}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
+            {offer.discountPercentage && (
+              <Badge variant="success" size="sm" className="mt-1">
+                -{offer.discountPercentage}%
+              </Badge>
+            )}
+          </div>
+        </div>
+      ))}
+      {/* Link to all offers for this aisle is now in PopularAislesGrid */}
+    </div>
   )
 }

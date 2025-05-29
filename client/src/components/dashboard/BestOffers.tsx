@@ -1,96 +1,95 @@
 "use client"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TrendingDown } from "lucide-react"
-import Link from "next/link"
+import type React from "react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
-interface Offer {
-  _id: string
-  productName: string
-  productQuantity?: string
-  offerPrice: number
-  previousPrice?: number
-  discountPercentage?: number
-  chainName: string
-  brand?: string
+import { Badge } from "@/components/ui/badge"
+import { Card, CardBody, CardHeader, CardFooter, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tag, ExternalLink } from "lucide-react" // Add ExternalLink
+
+import type { Offer } from "@/types/Offer"
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.3,
+      staggerChildren: 0.2,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+  },
 }
 
 interface BestOffersProps {
   offers: Offer[]
-  isLoading: boolean
 }
 
-export default function BestOffers({ offers, isLoading }: BestOffersProps) {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <TrendingDown className="h-5 w-5" />
-            <h3 className="text-lg font-semibold">Migliori Offerte</h3>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded animate-pulse"></div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
+const BestOffers: React.FC<BestOffersProps> = ({ offers }) => {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <TrendingDown className="h-5 w-5 text-primary-600" />
-          <h3 className="text-lg font-semibold">Migliori Offerte</h3>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {offers.length === 0 ? (
-          <p className="text-gray-500">Nessuna offerta disponibile al momento</p>
-        ) : (
-          <div className="space-y-4">
-            {offers.slice(0, 5).map((offer, index) => (
-              <motion.div
-                key={offer._id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-1">
-                  <h4 className="font-semibold">{offer.productName}</h4>
-                  <p className="text-sm text-gray-600">
-                    {offer.brand && `${offer.brand} • `}
-                    {offer.productQuantity}
-                  </p>
-                  <p className="text-sm text-gray-500">{offer.chainName}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
+    <motion.div
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {offers &&
+        offers.map((offer) => (
+          <motion.div key={offer._id} variants={itemVariants} className="h-full">
+            <Card
+              hover
+              className="flex flex-col h-full overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
+              <CardHeader className="pb-2">
+                {offer.discountPercentage && (
+                  <Badge variant="destructive" className="absolute top-3 right-3 text-sm py-1 px-2">
+                    -{offer.discountPercentage}% SCONTO
+                  </Badge>
+                )}
+                <CardTitle className="text-lg font-semibold text-gray-800 line-clamp-2 leading-tight h-14">
+                  {offer.productName}
+                </CardTitle>
+                <p className="text-xs text-gray-500 flex items-center pt-1">
+                  <Tag size={14} className="mr-1 text-primary-500" /> {offer.chainName}
+                </p>
+              </CardHeader>
+              <CardBody className="flex-grow py-2">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <p className="text-2xl font-bold text-primary-600">€{offer.offerPrice.toFixed(2)}</p>
                   {offer.previousPrice && (
-                    <p className="text-sm text-gray-500 line-through">€{offer.previousPrice.toFixed(2)}</p>
-                  )}
-                  {offer.discountPercentage && (
-                    <Badge variant="danger" size="sm" className="mt-1">
-                      -{offer.discountPercentage}%
-                    </Badge>
+                    <p className="text-sm text-gray-400 line-through">€{offer.previousPrice.toFixed(2)}</p>
                   )}
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-        <Link href="/offers" className="block mt-4 text-center text-primary-600 hover:underline">
-          Vedi tutte le offerte
-        </Link>
-      </CardContent>
-    </Card>
+                {offer.supermarketAisle && offer.supermarketAisle.length > 0 && (
+                  <p className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded inline-block">
+                    Reparto: {offer.supermarketAisle.join(", ")}
+                  </p>
+                )}
+              </CardBody>
+              <CardFooter className="pt-2">
+                <Link
+                  href={`/offers?productName=${encodeURIComponent(offer.productName)}&chainName=${encodeURIComponent(offer.chainName)}`}
+                  passHref
+                >
+                  <Button variant="primary" className="w-full">
+                    Vedi Dettagli <ExternalLink size={16} className="ml-2" />
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        ))}
+    </motion.div>
   )
 }
+
+export default BestOffers
