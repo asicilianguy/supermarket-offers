@@ -1,67 +1,81 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import type {
+  User,
+  AuthResponse,
+  LoginCredentials,
+  RegisterCredentials,
+  ShoppingListItem,
+  AddShoppingListItemPayload,
+  UpdateSupermarketsPayload,
+  UserShoppingListResponse,
+} from "@/types"
 
-// Define the base URL for the API
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
 
 export const userApiSlice = createApi({
   reducerPath: "userApi",
   baseQuery: fetchBaseQuery({
-    baseUrl,
+    baseUrl: `${baseUrl}/users`,
     prepareHeaders: (headers) => {
-      // Get the token from localStorage
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
-
-      // If we have a token, add it to the headers
       if (token) {
         headers.set("x-auth-token", token)
       }
-
       return headers
     },
   }),
   tagTypes: ["User", "ShoppingList"],
   endpoints: (builder) => ({
-    register: builder.mutation({
+    // Auth endpoints
+    register: builder.mutation<AuthResponse, RegisterCredentials>({
       query: (credentials) => ({
-        url: "/users/register",
+        url: "/register",
         method: "POST",
         body: credentials,
       }),
     }),
-    login: builder.mutation({
+    login: builder.mutation<AuthResponse, LoginCredentials>({
       query: (credentials) => ({
-        url: "/users/login",
+        url: "/login",
         method: "POST",
         body: credentials,
       }),
     }),
-    getUserProfile: builder.query({
-      query: () => "/users/profile",
+
+    // User profile endpoints
+    getUserProfile: builder.query<User, void>({
+      query: () => "/profile",
       providesTags: ["User"],
     }),
-    updateFrequentedSupermarkets: builder.mutation({
+
+    updateFrequentedSupermarkets: builder.mutation<User, UpdateSupermarketsPayload>({
       query: (data) => ({
-        url: "/users/supermarkets",
+        url: "/supermarkets",
         method: "PUT",
         body: data,
       }),
       invalidatesTags: ["User"],
     }),
-    getShoppingList: builder.query({
-      query: () => "/users/shopping-list",
+
+    // Shopping list endpoints
+    getShoppingList: builder.query<ShoppingListItem[], void>({
+      query: () => "/shopping-list",
       providesTags: ["ShoppingList"],
+      transformResponse: (response: UserShoppingListResponse) => response.data,
     }),
-    addToShoppingList: builder.mutation({
+
+    addToShoppingList: builder.mutation<ShoppingListItem, AddShoppingListItemPayload>({
       query: (item) => ({
-        url: "/users/shopping-list",
+        url: "/shopping-list",
         method: "POST",
         body: item,
       }),
       invalidatesTags: ["ShoppingList"],
     }),
-    removeFromShoppingList: builder.mutation({
+
+    removeFromShoppingList: builder.mutation<{ success: boolean; message: string }, string>({
       query: (itemId) => ({
-        url: `/users/shopping-list/${itemId}`,
+        url: `/shopping-list/${itemId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["ShoppingList"],

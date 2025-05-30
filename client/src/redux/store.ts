@@ -1,28 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit"
-import { setupListeners } from "@reduxjs/toolkit/query"
+import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux"
+import authReducer from "./features/auth/authSlice"
 import { userApiSlice } from "./features/user/userApiSlice"
-import { productOfferApiSlice } from "./features/productOffer/productOfferApiSlice"
-import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
+import { offersApiSlice } from "./features/offers/offersApiSlice"
 
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     [userApiSlice.reducerPath]: userApiSlice.reducer,
-    [productOfferApiSlice.reducerPath]: productOfferApiSlice.reducer,
+    [offersApiSlice.reducerPath]: offersApiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
-      },
-    }).concat(userApiSlice.middleware, productOfferApiSlice.middleware),
-  devTools: process.env.NODE_ENV !== "production",
+    getDefaultMiddleware().concat(userApiSlice.middleware, offersApiSlice.middleware),
 })
-
-setupListeners(store.dispatch)
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
-// Typed hooks
 export const useAppDispatch = () => useDispatch<AppDispatch>()
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
